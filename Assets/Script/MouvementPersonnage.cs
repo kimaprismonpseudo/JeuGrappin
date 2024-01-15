@@ -39,7 +39,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
 
 
-        float horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * Time.deltaTime;
+        float horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed; // Time.deltaTime;
 
 
         if (this.Hor == -1000000)
@@ -52,15 +52,15 @@ public class MouvementPerosnnage : MonoBehaviour
             Debug.Log($"Hor : {this.Hor} , horizontalMovement : {horizontalMovement}");
         }
 
-
+        /*
         if (Math.Abs(this.dTime - Time.deltaTime) > 0.007f)
         {
             horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * this.dTime;
-            Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} - this.dTime, horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));
+            Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} - this.dTime : {3} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement, this.dTime));
             Debug.Log($"Hor : {this.Hor} , horizontalMovement : {horizontalMovement}");
 
         }
-
+        */
         
 
         this.Hor = horizontalMovement;
