@@ -15,7 +15,7 @@ public class MouvementPerosnnage : MonoBehaviour
     public bool DebugC = true;
     public float Hor = -1000000;
 
-
+    public float dTime = 0.007f;
 
 
     // Start is called before the first frame update
@@ -38,10 +38,15 @@ public class MouvementPerosnnage : MonoBehaviour
             this.DebugC = !this.DebugC;
 
 
+
         float horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * Time.deltaTime;
 
+
         if (this.Hor == -1000000)
-            this.Hor = horizontalMovement;
+            this.Hor = horizontalMovement; 
+        
+        if (Math.Abs(this.dTime - Time.deltaTime) > 0.01f)
+            horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * this.dTime;
 
         if (Math.Abs(this.Hor - horizontalMovement) > 20)
         {
