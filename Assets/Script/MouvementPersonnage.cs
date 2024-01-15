@@ -43,10 +43,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
 
         if (this.Hor == -1000000)
-            this.Hor = horizontalMovement; 
-        
-        if (Math.Abs(this.dTime - Time.deltaTime) > 0.01f)
-            horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * this.dTime;
+            this.Hor = horizontalMovement;
 
         if (Math.Abs(this.Hor - horizontalMovement) > 20)
         {
@@ -54,6 +51,17 @@ public class MouvementPerosnnage : MonoBehaviour
             Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));
             Debug.Log($"Hor : {this.Hor} , horizontalMovement : {horizontalMovement}");
         }
+
+
+        if (Math.Abs(this.dTime - Time.deltaTime) > 0.007f)
+        {
+            horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * this.dTime;
+            Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} - this.dTime, horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));
+            Debug.Log($"Hor : {this.Hor} , horizontalMovement : {horizontalMovement}");
+
+        }
+
+        
 
         this.Hor = horizontalMovement;
 
