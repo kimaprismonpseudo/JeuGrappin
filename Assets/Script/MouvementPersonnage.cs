@@ -13,9 +13,6 @@ public class MouvementPerosnnage : MonoBehaviour
     public Rigidbody2D rb;
 
     public bool DebugC = true;
-    public float Hor = -1000000;
-
-    public float dTime = 0.007f;
 
 
     // Start is called before the first frame update
@@ -27,6 +24,8 @@ public class MouvementPerosnnage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        MAJDebugConsole();
         MAJPositionPlayer();
     }
 
@@ -34,45 +33,24 @@ public class MouvementPerosnnage : MonoBehaviour
     // Fonction Jimmy
     private void MAJPositionPlayer()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            this.DebugC = !this.DebugC;
-
-
-
-        float horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed; // Time.deltaTime;
-
-
-        if (this.Hor == -1000000)
-            this.Hor = horizontalMovement;
-
-        if (Math.Abs(this.Hor - horizontalMovement) > 20)
-        {
-            this.DebugC = false;
-            Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));
-            Debug.Log($"Hor : {this.Hor} , horizontalMovement : {horizontalMovement}");
-        }
-
-        /*
-        if (Math.Abs(this.dTime - Time.deltaTime) > 0.007f)
-        {
-            horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed * this.dTime;
-            Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} - this.dTime : {3} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement, this.dTime));
-            Debug.Log($"Hor : {this.Hor} , horizontalMovement : {horizontalMovement}");
-
-        }
-        */
         
 
-        this.Hor = horizontalMovement;
+        float horizontalMovement = Input.GetAxis("Horizontal") * this.moveSpeed;      
 
-        Vector3 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
+        Vector2 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
+
+        this.rb.velocity = TargetVelocity;
 
         if (this.DebugC)
             Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));
 
-        this.rb.velocity = Vector3.SmoothDamp(this.rb.velocity, TargetVelocity, ref this.Velocity, .05f);
     }
 
+    private void MAJDebugConsole()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            this.DebugC = !this.DebugC;
+    }
 
     private void QuelTouche()
     {
