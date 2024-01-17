@@ -28,6 +28,11 @@ public class GrappinSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (isGrappling) 
+            Line.SetPosition(0, transform.position);
+
+
         if (Input.GetMouseButtonDown(0) && this.isGrappling == false)
         {
             StartGrapple();
@@ -47,6 +52,11 @@ public class GrappinSystem : MonoBehaviour
                 this.isGrappling = false;
                 Line.enabled = false;
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            this.retracting = true;
         }
     }
 
@@ -89,7 +99,5 @@ public class GrappinSystem : MonoBehaviour
         }
 
         Line.SetPosition(1, target);
-        this.retracting = true;
-
     }
 }
