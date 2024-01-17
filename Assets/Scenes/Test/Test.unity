@@ -246,9 +246,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   rb: {fileID: 167431231}
-  DebugC: 1
-  Hor: -1000000
-  dTime: 0.007
+  FlipCheck: {fileID: 167431228}
 --- !u!50 &167431231
 Rigidbody2D:
   serializedVersion: 4
@@ -650,9 +648,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 0
   rb: {fileID: 748231769}
-  DebugC: 1
-  Hor: -1000000
-  dTime: 0.007
+  FlipCheck: {fileID: 748231767}
 --- !u!1 &783799811
 GameObject:
   m_ObjectHideFlags: 0
