@@ -14,7 +14,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
     // Private 
     private Vector3 Velocity = Vector3.zero;
-    private bool DebugC = true;
+    private bool DebugC = false;
     private bool isFlip;
     
 
