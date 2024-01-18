@@ -7,10 +7,9 @@ public class MouvementPerosnnage : MonoBehaviour
 {
 
     // Public 
-    public float moveSpeed;
+    public float moveSpeed = 3;
     public Rigidbody2D rb;
-    public SpriteRenderer FlipCheck;
-
+    public SpriteRenderer FlipCheck;    
 
     // Private 
     private Vector3 Velocity = Vector3.zero;
@@ -24,14 +23,17 @@ public class MouvementPerosnnage : MonoBehaviour
     {
         //this.isFlip = false;
         Debug.Log("MouvementPerosnnage - Debut");
+
+        this.rb.freezeRotation = true;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        MAJDebugConsole();
+      //  MAJDebugConsole();
         MAJPositionPlayer();
-        MAJFlipPlayer();
+        MAJFlipPlayer();    
     }
 
 

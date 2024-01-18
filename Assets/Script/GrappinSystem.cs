@@ -12,30 +12,81 @@ public class GrappinSystem : MonoBehaviour
     public float maxdistance = 10;
     public float grappleSpeed = 10;
     public float grappleShootSpeed = 20;
-
+    private float GrappinX = -0.1f;
+    private float GrappinY = 0.5f;
     public bool isGrappling = false;
     public bool retracting = false;
 
-    Vector2 target;
+    private enum Clic {Gauche, Droit };
+
+    private Dictionary<Clic, bool> ClicMouse;
+
+    private Vector3 PosGrappinStart;
+
+    private Vector2 target;
+    private Vector2 PosGrappinFin;
 
 
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("Grappin on");
+        this.ClicMouse = new Dictionary<Clic, bool>(2) { { Clic.Gauche, false }, { Clic.Droit, false } };
     }
 
     // Update is called once per frame
     void Update()
     {
+        GrappinSystemUpdate();
+    }
 
-        if (isGrappling) 
-            Line.SetPosition(0, transform.position);
+    private void GrappinSystemUpdate()
+    {
+        KeyUpdate();
+
+        VariableUpdate();        
+    }
 
 
-        if (Input.GetMouseButtonDown(0) && this.isGrappling == false)
+    private void KeyUpdate()
+    {
+        if (this.ClicMouse[Clic.Gauche] == false)
+        {
+            this.ClicMouse[Clic.Gauche] = Input.GetMouseButtonDown(0);
+        }
+        else
+        {
+            this.ClicMouse[Clic.Gauche] = !Input.GetMouseButtonUp(0);
+        }
+
+
+        if (this.ClicMouse[Clic.Gauche] && this.isGrappling == false)
         {
             StartGrapple();
+            Debug.Log("StartGrapple");
+        }
+
+        if (!this.ClicMouse[Clic.Gauche] && this.isGrappling)
+        {
+            EndGrapple();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && this.isGrappling)
+        {
+            this.retracting = true;
+        }
+
+    }
+
+    private void VariableUpdate()
+    {
+        this.Flip();
+
+        this.PosGrappinStart = new Vector3(transform.position.x + this.GrappinX, transform.position.y + this.GrappinY, -1);
+
+        if (isGrappling)
+        {
+            Line.SetPosition(0, this.PosGrappinStart);
         }
 
         if (this.retracting)
@@ -44,7 +95,7 @@ public class GrappinSystem : MonoBehaviour
 
             transform.position = grapplePos;
 
-            Line.SetPosition(0, transform.position);
+            Line.SetPosition(0, this.PosGrappinStart);
 
             if (Vector2.Distance(transform.position, this.target) < 1f)
             {
@@ -54,9 +105,18 @@ public class GrappinSystem : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+
+
+        if (!this.ClicMouse[Clic.Gauche] && this.isGrappling)
         {
-            this.retracting = true;
+            Debug.Log("G1");
+            if (Vector2.Distance(this.PosGrappinStart, this.PosGrappinFin) < 1f)
+            {
+                Debug.Log("G2");
+                this.retracting = false;
+                this.isGrappling = false;
+                Line.enabled = false;
+            }
         }
     }
 
@@ -78,26 +138,68 @@ public class GrappinSystem : MonoBehaviour
         }
     }
 
+    private void EndGrapple()
+    {
+        StartCoroutine(UnGrapple());
+    }
 
     IEnumerator Grapple()
     {
         float t = 0;
         float time = 10;
 
-        Line.SetPosition(0, transform.position);
-        Line.SetPosition(1, transform.position);
+        Line.SetPosition(0, this.PosGrappinStart);
+        Line.SetPosition(1, this.PosGrappinStart);
 
         Vector2 newPos;
 
         for (; t < time; t += this.grappleShootSpeed * Time.deltaTime)
         {
-            newPos = Vector2.Lerp(transform.position, this.target, t / time);
+            if (this.ClicMouse[Clic.Gauche])
+            {
+                newPos = Vector2.Lerp(this.PosGrappinStart, this.target, t / time);
 
-            Line.SetPosition(0, transform.position);
+                Line.SetPosition(0, this.PosGrappinStart);
+                Line.SetPosition(1, newPos);
+                this.PosGrappinFin = newPos;
+            }
+            yield return null;   
+        }
+
+        if (this.ClicMouse[Clic.Gauche])
+        {
+            Line.SetPosition(1, this.PosGrappinFin);
+        }
+    }
+
+    IEnumerator UnGrapple()
+    {
+        float t = 0;
+        float time = 10;
+
+        Line.SetPosition(0, this.PosGrappinStart);
+        Line.SetPosition(1, this.PosGrappinFin);
+
+        Vector2 newPos = Vector2.zero;
+
+        for (; t < time; t += this.grappleShootSpeed * 3 * Time.deltaTime)
+        {
+            newPos = Vector2.Lerp(this.PosGrappinFin, this.PosGrappinStart, t / time);
+
+            Line.SetPosition(0, this.PosGrappinStart);
             Line.SetPosition(1, newPos);
             yield return null;
         }
+        this.PosGrappinFin = newPos;
+        Line.SetPosition(1, this.PosGrappinStart);
+    }
 
-        Line.SetPosition(1, target);
+    private void Flip()
+    {
+        float Axis = Input.GetAxis("Horizontal");
+        if (Axis >= 0)
+            this.GrappinX = -0.1f;
+        else
+            this.GrappinX = 0.1f;
     }
 }
