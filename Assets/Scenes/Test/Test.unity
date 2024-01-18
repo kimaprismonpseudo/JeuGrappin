@@ -139,6 +139,7 @@ GameObject:
   - component: {fileID: 167431230}
   - component: {fileID: 167431234}
   - component: {fileID: 167431233}
+  - component: {fileID: 167431235}
   m_Layer: 0
   m_Name: Personnage_ATexture
   m_TagString: Untagged
@@ -249,6 +250,7 @@ MonoBehaviour:
   moveSpeed: 10
   rb: {fileID: 167431231}
   FlipCheck: {fileID: 167431228}
+  Grappin: {fileID: 167431233}
 --- !u!50 &167431231
 Rigidbody2D:
   serializedVersion: 4
@@ -334,12 +336,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Line: {fileID: 167431234}
+  Joint: {fileID: 167431235}
   GrappleMask:
     serializedVersion: 2
     m_Bits: 64
   maxdistance: 10
-  grappleSpeed: 10
-  grappleShootSpeed: 20
+  grappleSpeed: 3
+  grappleShootSpeed: 60
   isGrappling: 0
   retracting: 0
 --- !u!120 &167431234
@@ -444,6 +447,26 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!232 &167431235
+DistanceJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167431226}
+  m_Enabled: 0
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 0
+  m_Anchor: {x: 0, y: 0}
+  m_ConnectedAnchor: {x: 0, y: 0}
+  m_AutoConfigureDistance: 1
+  m_Distance: 5.0911417
+  m_MaxDistanceOnly: 0
 --- !u!1 &306818009
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,7 +547,7 @@ Transform:
   m_GameObject: {fileID: 306818009}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.5162, z: 0}
+  m_LocalPosition: {x: 0, y: 4.86, z: 0}
   m_LocalScale: {x: 1, y: 1.0877, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -774,6 +797,7 @@ MonoBehaviour:
   moveSpeed: 0
   rb: {fileID: 748231769}
   FlipCheck: {fileID: 748231767}
+  Grappin: {fileID: 0}
 --- !u!1 &783799811
 GameObject:
   m_ObjectHideFlags: 0

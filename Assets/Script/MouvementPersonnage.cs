@@ -15,6 +15,8 @@ public class MouvementPerosnnage : MonoBehaviour
     private Vector3 Velocity = Vector3.zero;
     private bool DebugC = false;
     private bool isFlip;
+
+    public GrappinSystem Grappin;
     
 
 
@@ -33,7 +35,12 @@ public class MouvementPerosnnage : MonoBehaviour
     {
       //  MAJDebugConsole();
         MAJPositionPlayer();
-        MAJFlipPlayer();    
+        MAJFlipPlayer();
+
+        if (this.Grappin.isGrappling)
+            moveSpeed = 10;
+        else
+            moveSpeed = 3;
     }
 
 

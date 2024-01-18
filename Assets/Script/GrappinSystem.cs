@@ -6,20 +6,23 @@ public class GrappinSystem : MonoBehaviour
 {
 
     public LineRenderer Line;
+    public DistanceJoint2D Joint;
 
     [SerializeField] LayerMask GrappleMask;
 
     public float maxdistance = 10;
-    public float grappleSpeed = 10;
-    public float grappleShootSpeed = 20;
-    private float GrappinX = -0.1f;
-    private float GrappinY = 0.5f;
+    public float grappleSpeed = 3;
+    public float grappleShootSpeed = 60;
+    private float GrappinX = 0.2f;
+    private float GrappinY = 0.4f;
+    private float JointX = -0.3f;
+    private float JointY = 0.7f;
     public bool isGrappling = false;
     public bool retracting = false;
 
     private enum Clic {Gauche, Droit };
 
-    private Dictionary<Clic, bool> ClicMouse;
+    private Dictionary<Clic, bool> ClicMouse = new Dictionary<Clic, bool>(2) { { Clic.Gauche, false }, { Clic.Droit, false } };
 
     private Vector3 PosGrappinStart;
 
@@ -31,7 +34,7 @@ public class GrappinSystem : MonoBehaviour
     void Start()
     {
         Debug.Log("Grappin on");
-        this.ClicMouse = new Dictionary<Clic, bool>(2) { { Clic.Gauche, false }, { Clic.Droit, false } };
+        this.Joint.enableCollision = true;
     }
 
     // Update is called once per frame
@@ -75,13 +78,16 @@ public class GrappinSystem : MonoBehaviour
         {
             this.retracting = true;
         }
+        
+        if (Input.GetKeyUp(KeyCode.Space) && this.retracting)
+        {
+            this.retracting = false;
+        }
 
     }
 
-    private void VariableUpdate()
+    private void PosGrappinUpdate()
     {
-        this.Flip();
-
         this.PosGrappinStart = new Vector3(transform.position.x + this.GrappinX, transform.position.y + this.GrappinY, -1);
 
         if (isGrappling)
@@ -89,6 +95,13 @@ public class GrappinSystem : MonoBehaviour
             Line.SetPosition(0, this.PosGrappinStart);
         }
 
+        this.Joint.connectedAnchor = this.PosGrappinFin;
+        this.Joint.anchor = new Vector2(this.JointX, this.JointY);
+    }
+
+
+    private void retractingUpdate()
+    {
         if (this.retracting)
         {
             Vector2 grapplePos = Vector2.Lerp(transform.position, this.target, grappleSpeed * Time.deltaTime);
@@ -106,7 +119,6 @@ public class GrappinSystem : MonoBehaviour
         }
 
 
-
         if (!this.ClicMouse[Clic.Gauche] && this.isGrappling)
         {
             if (Vector2.Distance(this.PosGrappinStart, this.PosGrappinFin) < 1f)
@@ -116,6 +128,20 @@ public class GrappinSystem : MonoBehaviour
                 Line.enabled = false;
             }
         }
+    }
+
+
+    private void VariableUpdate()
+    {
+        this.Flip();
+
+        this.PosGrappinUpdate();
+
+        this.retractingUpdate();
+
+        
+
+        
     }
 
 
@@ -138,6 +164,7 @@ public class GrappinSystem : MonoBehaviour
 
     private void EndGrapple()
     {
+        this.Joint.enabled = false;
         StartCoroutine(UnGrapple());
     }
 
@@ -167,6 +194,7 @@ public class GrappinSystem : MonoBehaviour
         if (this.ClicMouse[Clic.Gauche])
         {
             Line.SetPosition(1, this.PosGrappinFin);
+            this.Joint.enabled = true;
         }
     }
 
@@ -195,9 +223,15 @@ public class GrappinSystem : MonoBehaviour
     private void Flip()
     {
         float Axis = Input.GetAxis("Horizontal");
-        if (Axis >= 0)
-            this.GrappinX = -0.1f;
+        if (Axis < 0)
+        {
+            this.GrappinX = Mathf.Abs(this.GrappinX);
+            this.JointX = Mathf.Abs(this.JointX);
+        }
         else
-            this.GrappinX = 0.1f;
+        {
+            this.GrappinX = Mathf.Abs(this.GrappinX) * -1;
+            this.JointX = Mathf.Abs(this.JointX) * -1;
+        }
     }
 }
