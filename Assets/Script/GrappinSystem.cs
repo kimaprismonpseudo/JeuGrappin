@@ -109,10 +109,8 @@ public class GrappinSystem : MonoBehaviour
 
         if (!this.ClicMouse[Clic.Gauche] && this.isGrappling)
         {
-            Debug.Log("G1");
             if (Vector2.Distance(this.PosGrappinStart, this.PosGrappinFin) < 1f)
             {
-                Debug.Log("G2");
                 this.retracting = false;
                 this.isGrappling = false;
                 Line.enabled = false;
