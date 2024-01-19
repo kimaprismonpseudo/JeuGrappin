@@ -3,38 +3,143 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GrappinSystem : MonoBehaviour
-{
+{    
+    private class GrappinSysChild
+    {
+        public string Name;
+        public LineRenderer Line;
+        public DistanceJoint2D Joint;
+        public static LayerMask GrappleMask;
 
-    public LineRenderer Line;
-    public DistanceJoint2D Joint;
+        public bool isGrappling = false;
+        public bool retracting = false;
+        public bool isUnGrappling = false;
 
-    [SerializeField] LayerMask GrappleMask;
+        public static float maxdistance = 20;
+        public static float grappleSpeed = 5;
+        public static float grappleShootSpeed = 60;
 
-    public float maxdistance = 10;
-    public float grappleSpeed = 3;
-    public float grappleShootSpeed = 60;
-    private float GrappinX = 0.2f;
-    private float GrappinY = 0.4f;
-    private float JointX = -0.3f;
-    private float JointY = 0.7f;
-    public bool isGrappling = false;
-    public bool retracting = false;
+        public static float GrappinX = 0.2f;
+        public static float GrappinY = 0.4f;
+        public static float JointX = -0.3f;
+        public static float JointY = 0.7f;
+        
+        public Vector3 PosGrappinStart;
+        public Vector2 target;
+        public Vector2 PosGrappinFin;
+        public Clic KeyAssocie;
 
-    private enum Clic {Gauche, Droit };
+        public GrappinSysChild(GameObject _Grappin, string _Name, Clic _KeyAssocie)
+        {
+            this.Line = _Grappin.GetComponent<LineRenderer>();
+            this.Joint = _Grappin.GetComponent<DistanceJoint2D>();
+            this.Name = _Name;
+            this.KeyAssocie = _KeyAssocie;
+        }
 
-    private Dictionary<Clic, bool> ClicMouse = new Dictionary<Clic, bool>(2) { { Clic.Gauche, false }, { Clic.Droit, false } };
+        public IEnumerator Grapple(bool _Condition)
+        {
+            float t = 0;
+            float time = 10;
 
-    private Vector3 PosGrappinStart;
+            this.Line.SetPosition(0, this.PosGrappinStart);
+            this.Line.SetPosition(1, this.PosGrappinStart);
 
-    private Vector2 target;
-    private Vector2 PosGrappinFin;
+            Vector2 newPos;
 
+            for (; t < time; t += GrappinSysChild.grappleShootSpeed * Time.deltaTime)
+            {
+                if (_Condition)
+                {
+                    newPos = Vector2.Lerp(this.PosGrappinStart, this.target, t / time);
+
+                    this.Line.SetPosition(0, this.PosGrappinStart);
+                    this.Line.SetPosition(1, newPos);
+                    this.PosGrappinFin = newPos;
+                }
+                yield return null;
+            }
+
+            if (_Condition)
+            {
+                Line.SetPosition(1, this.PosGrappinFin);
+                this.Joint.enabled = true;
+            }
+        }
+
+        public IEnumerator UnGrapple()
+        {
+            float t = 0;
+            float time = 10;
+
+            this.Line.SetPosition(0, this.PosGrappinStart);
+            this.Line.SetPosition(1, this.PosGrappinFin);
+
+            Vector2 newPos = Vector2.zero;
+
+            for (; t < time; t += GrappinSysChild.grappleShootSpeed * 3 * Time.deltaTime)
+            {
+                newPos = Vector2.Lerp(this.PosGrappinFin, this.PosGrappinStart, t / time);
+
+                this.Line.SetPosition(0, this.PosGrappinStart);
+                this.Line.SetPosition(1, newPos);
+                yield return null;
+            }
+            this.PosGrappinFin = newPos;
+            this.Line.SetPosition(1, this.PosGrappinStart);
+        }
+
+    };
+
+    private GrappinSysChild GrappinSys1;
+    private GrappinSysChild GrappinSys2;
+
+    private enum Clic {MGauche, MDroit, Espace, DGauche, DDroit };
+    // Mouse Gauche , Mouse Droit, Espace, Deplacement Gauche, Deplacement Droit
+
+    private Dictionary<Clic, bool> PressKey = new Dictionary<Clic, bool>() 
+    { 
+        { Clic.MGauche, false }, 
+        { Clic.MDroit, false }, 
+        { Clic.Espace, false }, 
+        { Clic.DGauche, false }, 
+        { Clic.DDroit, false }
+    };
+
+
+    public LayerMask GrappleMask;
+    public Transform Grappin1;
+    public Transform Grappin2;
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Grappin on");
-        this.Joint.enableCollision = true;
+        if (InitGrappin())
+            Debug.Log("Grappin on");
+        else
+            Debug.Log("Grappin off");
+    }
+
+    private bool InitGrappin()
+    {
+        try
+        {
+            GameObject Grappin1 = this.Grappin1.gameObject;
+            GameObject Grappin2 = this.Grappin2.gameObject;
+
+            GrappinSys1 = new GrappinSysChild(Grappin1, "Grappin1", Clic.MGauche);
+            GrappinSys2 = new GrappinSysChild(Grappin2, "Grappin2", Clic.MDroit);
+
+            GrappinSys1.Joint.enableCollision = true;
+            GrappinSys2.Joint.enableCollision = true;
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        };
+        
     }
 
     // Update is called once per frame
@@ -45,193 +150,200 @@ public class GrappinSystem : MonoBehaviour
 
     private void GrappinSystemUpdate()
     {
-        KeyUpdate();
+        GrappinSysChild.GrappleMask = this.GrappleMask;
 
-        VariableUpdate();        
+        Debug.Log(this.transform.position);
+        Debug.Log(this.Grappin1.position);
+
+        Vector2 Test = this.Grappin1.position;
+
+        if (Input.GetKeyDown(KeyCode.B))
+            this.transform.position = Test;
+
+
+
+        PressKeyUpdate();
+
+        Flip();
+
+        PosGrappinUpdate();
+
+        GrappinUpdate();
+
+        RetractingUpdate();
+
     }
 
-
-    private void KeyUpdate()
+    private void PressKeyUpdate()
     {
-        if (this.ClicMouse[Clic.Gauche] == false)
+        this.PressKey[Clic.MGauche] = Input.GetMouseButton(0); 
+        this.PressKey[Clic.MDroit] = Input.GetMouseButton(1);
+        this.PressKey[Clic.Espace] = Input.GetKey(KeyCode.Space);
+
+        switch (Input.GetAxisRaw("Horizontal"))
         {
-            this.ClicMouse[Clic.Gauche] = Input.GetMouseButtonDown(0);
-        }
-        else
-        {
-            this.ClicMouse[Clic.Gauche] = !Input.GetMouseButtonUp(0);
-        }
+
+            case (1):
+                this.PressKey[Clic.DDroit] = true;
+                this.PressKey[Clic.DGauche] = false;
+                break;
 
 
-        if (this.ClicMouse[Clic.Gauche] && this.isGrappling == false)
-        {
-            StartGrapple();
-            Debug.Log("StartGrapple");
-        }
+            case (-1):
+                this.PressKey[Clic.DDroit] = false;
+                this.PressKey[Clic.DGauche] = true;
+                break;
 
-        if (!this.ClicMouse[Clic.Gauche] && this.isGrappling)
-        {
-            EndGrapple();
-        }
 
-        if (Input.GetKeyDown(KeyCode.Space) && this.isGrappling)
-        {
-            this.retracting = true;
+            // 2 cas possible, aucune touche n'est presser ou à l'inverse les deux le sont
+            case (0):
+                // Donc on verifie une seul touche pour savoir
+                if (Input.GetKey(KeyCode.D))
+                {
+                    this.PressKey[Clic.DDroit] = true;
+                    this.PressKey[Clic.DGauche] = true;
+                }
+                else
+                {
+                    this.PressKey[Clic.DDroit] = false;
+                    this.PressKey[Clic.DGauche] = false;
+                }
+                break;
         }
-        
-        if (Input.GetKeyUp(KeyCode.Space) && this.retracting)
-        {
-            this.retracting = false;
-        }
-
     }
+
+
+    private void GrappinUpdate()
+    {
+        this.GrappinChildUpdate(ref this.GrappinSys1);
+        this.GrappinChildUpdate(ref this.GrappinSys2);
+    }
+
+    private void GrappinChildUpdate(ref GrappinSysChild _Grappin)
+    {
+        if(this.PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling == false)
+        {
+            StartGrapple(ref _Grappin);
+        }
+
+        if (!this.PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling)
+        {
+            EndGrapple(ref _Grappin);
+        }
+
+        if (this.PressKey[Clic.Espace] && _Grappin.isGrappling)
+        {
+            Debug.Log("Pret");
+            _Grappin.retracting = true;
+        }
+
+        if (this.PressKey[Clic.Espace] == false && _Grappin.retracting)
+        {
+            _Grappin.retracting = false;
+        }
+    }
+
 
     private void PosGrappinUpdate()
     {
-        this.PosGrappinStart = new Vector3(transform.position.x + this.GrappinX, transform.position.y + this.GrappinY, -1);
+        this.PosGrappinChildUpdate(ref this.GrappinSys1);
+        this.PosGrappinChildUpdate(ref this.GrappinSys2);
+    }
+    
+    private void PosGrappinChildUpdate(ref GrappinSysChild _Grappin)
+    {
+        _Grappin.PosGrappinStart = new Vector3(transform.position.x + GrappinSysChild.GrappinX, transform.position.y + GrappinSysChild.GrappinY, -1);
 
-        if (isGrappling)
+        if (_Grappin.isGrappling)
         {
-            Line.SetPosition(0, this.PosGrappinStart);
+            _Grappin.Line.SetPosition(0, _Grappin.PosGrappinStart);
         }
 
-        this.Joint.connectedAnchor = this.PosGrappinFin;
-        this.Joint.anchor = new Vector2(this.JointX, this.JointY);
+        _Grappin.Joint.connectedAnchor = _Grappin.PosGrappinFin;
+        _Grappin.Joint.anchor = new Vector2(GrappinSysChild.JointX, GrappinSysChild.JointY);
     }
 
 
-    private void retractingUpdate()
+    private void RetractingUpdate()
     {
-        if (this.retracting)
+        this.RetractingChildUpdate(ref this.GrappinSys1);
+        this.RetractingChildUpdate(ref this.GrappinSys2);
+    }
+
+    private void RetractingChildUpdate(ref GrappinSysChild _Grappin)
+    {
+        if (_Grappin.retracting)
         {
-            Vector2 grapplePos = Vector2.Lerp(transform.position, this.target, grappleSpeed * Time.deltaTime);
+            Debug.Log("Retracting");
+            Vector2 grapplePos = Vector2.Lerp(transform.position, _Grappin.target, GrappinSysChild.grappleSpeed * Time.deltaTime);
 
             transform.position = grapplePos;
 
-            Line.SetPosition(0, this.PosGrappinStart);
+            _Grappin.Line.SetPosition(0, _Grappin.PosGrappinStart);
 
-            if (Vector2.Distance(transform.position, this.target) < 1f)
+            if (Vector2.Distance(transform.position, _Grappin.target) < 1f)
             {
-                this.retracting = false;
-                this.isGrappling = false;
-                Line.enabled = false;
+                _Grappin.retracting = false;
+                _Grappin.isGrappling = false;
+                _Grappin.Line.enabled = false;
             }
         }
 
 
-        if (!this.ClicMouse[Clic.Gauche] && this.isGrappling)
+        if (!this.PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling)
         {
-            if (Vector2.Distance(this.PosGrappinStart, this.PosGrappinFin) < 1f)
+            if (Vector2.Distance(_Grappin.PosGrappinStart, _Grappin.PosGrappinFin) < 1f)
             {
-                this.retracting = false;
-                this.isGrappling = false;
-                Line.enabled = false;
+                _Grappin.retracting = false;
+                _Grappin.isGrappling = false;
+                _Grappin.Line.enabled = false;
             }
         }
     }
 
-
-    private void VariableUpdate()
-    {
-        this.Flip();
-
-        this.PosGrappinUpdate();
-
-        this.retractingUpdate();
-
-        
-
-        
-    }
-
-
-    private void StartGrapple()
-    {
-        Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, this.maxdistance, this.GrappleMask);
-
-        if (hit.collider != null)
-        {
-            this.isGrappling = true;
-            target = hit.point;
-            Line.enabled = true;
-            Line.positionCount = 2;
-
-            StartCoroutine(Grapple());
-        }
-    }
-
-    private void EndGrapple()
-    {
-        this.Joint.enabled = false;
-        StartCoroutine(UnGrapple());
-    }
-
-    IEnumerator Grapple()
-    {
-        float t = 0;
-        float time = 10;
-
-        Line.SetPosition(0, this.PosGrappinStart);
-        Line.SetPosition(1, this.PosGrappinStart);
-
-        Vector2 newPos;
-
-        for (; t < time; t += this.grappleShootSpeed * Time.deltaTime)
-        {
-            if (this.ClicMouse[Clic.Gauche])
-            {
-                newPos = Vector2.Lerp(this.PosGrappinStart, this.target, t / time);
-
-                Line.SetPosition(0, this.PosGrappinStart);
-                Line.SetPosition(1, newPos);
-                this.PosGrappinFin = newPos;
-            }
-            yield return null;   
-        }
-
-        if (this.ClicMouse[Clic.Gauche])
-        {
-            Line.SetPosition(1, this.PosGrappinFin);
-            this.Joint.enabled = true;
-        }
-    }
-
-    IEnumerator UnGrapple()
-    {
-        float t = 0;
-        float time = 10;
-
-        Line.SetPosition(0, this.PosGrappinStart);
-        Line.SetPosition(1, this.PosGrappinFin);
-
-        Vector2 newPos = Vector2.zero;
-
-        for (; t < time; t += this.grappleShootSpeed * 3 * Time.deltaTime)
-        {
-            newPos = Vector2.Lerp(this.PosGrappinFin, this.PosGrappinStart, t / time);
-
-            Line.SetPosition(0, this.PosGrappinStart);
-            Line.SetPosition(1, newPos);
-            yield return null;
-        }
-        this.PosGrappinFin = newPos;
-        Line.SetPosition(1, this.PosGrappinStart);
-    }
 
     private void Flip()
     {
-        float Axis = Input.GetAxis("Horizontal");
-        if (Axis < 0)
+        if (this.PressKey[Clic.DGauche])
         {
-            this.GrappinX = Mathf.Abs(this.GrappinX);
-            this.JointX = Mathf.Abs(this.JointX);
+            GrappinSysChild.GrappinX = Mathf.Abs(GrappinSysChild.GrappinX);
+            GrappinSysChild.JointX = Mathf.Abs(GrappinSysChild.JointX);
         }
         else
         {
-            this.GrappinX = Mathf.Abs(this.GrappinX) * -1;
-            this.JointX = Mathf.Abs(this.JointX) * -1;
+            GrappinSysChild.GrappinX = Mathf.Abs(GrappinSysChild.GrappinX) * -1;
+            GrappinSysChild.JointX = Mathf.Abs(GrappinSysChild.JointX) * -1;
+        }
+
+    }
+
+    private void StartGrapple(ref GrappinSysChild _Grappin)
+    {
+        Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, GrappinSysChild.maxdistance, GrappinSysChild.GrappleMask);
+
+        if (hit.collider != null)
+        {
+            _Grappin.isGrappling = true;
+            _Grappin.target = hit.point;
+            _Grappin.Line.enabled = true;
+            _Grappin.Line.positionCount = 2;
+
+            StartCoroutine(_Grappin.Grapple(this.PressKey[_Grappin.KeyAssocie]));
         }
     }
+
+    private void EndGrapple(ref GrappinSysChild _Grappin)
+    {
+        _Grappin.Joint.enabled = false;
+        StartCoroutine(_Grappin.UnGrapple());
+    }
+
+    
+
+    
+
+    
+
 }

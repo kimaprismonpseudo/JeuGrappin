@@ -37,10 +37,10 @@ public class MouvementPerosnnage : MonoBehaviour
         MAJPositionPlayer();
         MAJFlipPlayer();
 
-        if (this.Grappin.isGrappling)
-            moveSpeed = 10;
-        else
-            moveSpeed = 3;
+        //if (this.Grappin.isGrappling)
+        //    moveSpeed = 10;
+        //else
+        //    moveSpeed = 3;
     }
 
 
