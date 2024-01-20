@@ -9,7 +9,8 @@ public class MouvementPerosnnage : MonoBehaviour
     // Public 
     public float moveSpeed = 3;
     public Rigidbody2D rb;
-    public SpriteRenderer FlipCheck;    
+    public SpriteRenderer FlipCheck;
+    public static bool isGrapplingPlayer = false;
 
     // Private 
     private Vector3 Velocity = Vector3.zero;
@@ -17,6 +18,11 @@ public class MouvementPerosnnage : MonoBehaviour
     private bool isFlip;
 
     public GrappinSystem Grappin;
+
+    public Transform GroundCheckL;
+    public Transform GroundCheckR;
+
+    public bool IsGrounded = true;
     
 
 
@@ -37,10 +43,11 @@ public class MouvementPerosnnage : MonoBehaviour
         MAJPositionPlayer();
         MAJFlipPlayer();
 
-        //if (this.Grappin.isGrappling)
-        //    moveSpeed = 10;
-        //else
-        //    moveSpeed = 3;
+        this.IsGrounded = Physics2D.OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
+        if (isGrapplingPlayer)
+            moveSpeed = 10;
+        else
+            moveSpeed = 3;
     }
 
 
@@ -57,7 +64,8 @@ public class MouvementPerosnnage : MonoBehaviour
 
         Vector2 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
 
-        this.rb.velocity = TargetVelocity;
+        if (this.IsGrounded || isGrapplingPlayer)
+            this.rb.velocity = TargetVelocity;
 
         if (this.DebugC)
             Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));

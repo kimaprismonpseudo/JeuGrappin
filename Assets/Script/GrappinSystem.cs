@@ -10,10 +10,23 @@ public class GrappinSystem : MonoBehaviour
         public LineRenderer Line;
         public DistanceJoint2D Joint;
         public static LayerMask GrappleMask;
+        public Rigidbody2D RB;
+        public GameObject Origine; 
 
-        public bool isGrappling = false;
+        private bool isGrapplingP = false;
         public bool retracting = false;
         public bool isUnGrappling = false;
+
+        private static bool SomeOneGrapplingP;
+        private static List<GrappinSysChild> MesGrappins = new List<GrappinSysChild>();
+
+        public static bool SomeOneGrappling
+        {
+            get
+            {
+                return SomeOneGrapplingP;
+            }
+        }
 
         public static float maxdistance = 20;
         public static float grappleSpeed = 5;
@@ -21,20 +34,72 @@ public class GrappinSystem : MonoBehaviour
 
         public static float GrappinX = 0.2f;
         public static float GrappinY = 0.4f;
-        public static float JointX = -0.3f;
-        public static float JointY = 0.7f;
+        public static float JointX = 0;//= -0.3f;
+        public static float JointY = 0;//= 0.7f;
         
         public Vector3 PosGrappinStart;
         public Vector2 target;
         public Vector2 PosGrappinFin;
         public Clic KeyAssocie;
 
+        public bool isGrappling
+        {
+            get
+            {
+                return this.isGrapplingP;
+            }
+            
+            set
+            {
+                this.isGrapplingP = value;
+                SomeOneGrapplingP = GetSomeOneIsGrappling();
+                MouvementPerosnnage.isGrapplingPlayer = SomeOneGrappling;
+            }
+        }
+
+        private bool GetSomeOneIsGrappling()
+        {
+            foreach (GrappinSysChild g in MesGrappins)
+            {
+                if (g.isGrapplingP)
+                    return true;
+            }
+            return false;
+        }
+
+        public GrappinSysChild GetPasCeluila()
+        {
+            foreach (GrappinSysChild g in MesGrappins)
+            {
+                if (this != g)
+                    return g;
+            }
+            return null;
+        }
+
+
         public GrappinSysChild(GameObject _Grappin, string _Name, Clic _KeyAssocie)
         {
             this.Line = _Grappin.GetComponent<LineRenderer>();
             this.Joint = _Grappin.GetComponent<DistanceJoint2D>();
+            this.RB = _Grappin.GetComponent<Rigidbody2D>();
+            this.Joint.autoConfigureDistance = false;
+            this.Joint.enableCollision = true;
+            this.Origine = _Grappin;
             this.Name = _Name;
             this.KeyAssocie = _KeyAssocie;
+            MesGrappins.Add(this);
+        }
+
+        public GrappinSysChild(GameObject _Grappin, string _Name)
+        {
+            this.Line = _Grappin.GetComponent<LineRenderer>();
+            this.Joint = _Grappin.GetComponent<DistanceJoint2D>();
+            this.RB = _Grappin.GetComponent<Rigidbody2D>();
+            this.Joint.autoConfigureDistance = false;
+            this.Joint.enableCollision = true;
+            this.Origine = _Grappin;
+            this.Name = _Name;
         }
 
         public IEnumerator Grapple(bool _Condition)
@@ -63,7 +128,9 @@ public class GrappinSystem : MonoBehaviour
             if (_Condition)
             {
                 Line.SetPosition(1, this.PosGrappinFin);
+                this.Joint.autoConfigureDistance = true;
                 this.Joint.enabled = true;
+                this.Joint.autoConfigureDistance = false;
             }
         }
 
@@ -93,6 +160,8 @@ public class GrappinSystem : MonoBehaviour
 
     private GrappinSysChild GrappinSys1;
     private GrappinSysChild GrappinSys2;
+    private GrappinSysChild GrappinSysTest;
+    public float Ralentissement;
 
     private enum Clic {MGauche, MDroit, Espace, DGauche, DDroit };
     // Mouse Gauche , Mouse Droit, Espace, Deplacement Gauche, Deplacement Droit
@@ -108,8 +177,10 @@ public class GrappinSystem : MonoBehaviour
 
 
     public LayerMask GrappleMask;
-    public Transform Grappin1;
-    public Transform Grappin2;
+    public GameObject Grappin1;
+    public GameObject Grappin2;
+    public GameObject GrappinTest;
+    public Rigidbody2D Player;
 
     // Start is called before the first frame update
     void Start()
@@ -124,14 +195,9 @@ public class GrappinSystem : MonoBehaviour
     {
         try
         {
-            GameObject Grappin1 = this.Grappin1.gameObject;
-            GameObject Grappin2 = this.Grappin2.gameObject;
-
-            GrappinSys1 = new GrappinSysChild(Grappin1, "Grappin1", Clic.MGauche);
-            GrappinSys2 = new GrappinSysChild(Grappin2, "Grappin2", Clic.MDroit);
-
-            GrappinSys1.Joint.enableCollision = true;
-            GrappinSys2.Joint.enableCollision = true;
+            this.GrappinSys1 = new GrappinSysChild(this.Grappin1, "Grappin1", Clic.MGauche);
+            this.GrappinSys2 = new GrappinSysChild(this.Grappin2, "Grappin2", Clic.MDroit);
+            this.GrappinSysTest = new GrappinSysChild(this.GrappinTest, "GrappinTest");
 
             return true;
         }
@@ -148,17 +214,53 @@ public class GrappinSystem : MonoBehaviour
         GrappinSystemUpdate();
     }
 
+    private void Balancement(ref GrappinSysChild _Grappin)
+    {
+        if (_Grappin.isGrappling)
+        {
+            _Grappin.RB.AddForce(BiblioGenerale.GetVelociteGrappin(_Grappin.RB.velocity, this.Player.velocity));
+            PositionUpdateAll(ref _Grappin);
+
+           // Debug.Log(_Grappin.RB.velocity);
+        }
+        else
+        {
+            PositionUpdateAll();
+        }
+        
+    }
+
+    private void PositionUpdateAll()
+    {
+        if (GrappinSysChild.SomeOneGrappling == false)
+        {
+            this.GrappinSys1.Origine.transform.position = this.transform.position;
+            this.GrappinSys2.Origine.transform.position = this.transform.position;
+
+            this.GrappinSys2.RB.velocity = this.Player.velocity;
+            this.GrappinSys2.RB.velocity = this.Player.velocity;
+        }
+
+    }
+
+    private void PositionUpdateAll(ref GrappinSysChild _Grappin)
+    {
+        this.transform.position = _Grappin.Origine.transform.position;
+        this.Player.velocity = _Grappin.RB.velocity;
+
+        _Grappin.GetPasCeluila().Origine.transform.position = _Grappin.Origine.transform.position;
+        _Grappin.GetPasCeluila().RB.velocity = _Grappin.RB.velocity;
+    }
+
     private void GrappinSystemUpdate()
     {
         GrappinSysChild.GrappleMask = this.GrappleMask;
+        BiblioGenerale.Ralentissement = this.Ralentissement;
 
-        Debug.Log(this.transform.position);
-        Debug.Log(this.Grappin1.position);
 
-        Vector2 Test = this.Grappin1.position;
-
-        if (Input.GetKeyDown(KeyCode.B))
-            this.transform.position = Test;
+        //Balancement(ref this.GrappinSysTest);
+        Balancement(ref this.GrappinSys1);
+        Balancement(ref this.GrappinSys2);
 
 
 
@@ -233,7 +335,7 @@ public class GrappinSystem : MonoBehaviour
 
         if (this.PressKey[Clic.Espace] && _Grappin.isGrappling)
         {
-            Debug.Log("Pret");
+           // Debug.Log("Pret");
             _Grappin.retracting = true;
         }
 
@@ -274,7 +376,10 @@ public class GrappinSystem : MonoBehaviour
     {
         if (_Grappin.retracting)
         {
-            Debug.Log("Retracting");
+
+            
+            //Debug.Log("Retracting");
+            /*
             Vector2 grapplePos = Vector2.Lerp(transform.position, _Grappin.target, GrappinSysChild.grappleSpeed * Time.deltaTime);
 
             transform.position = grapplePos;
@@ -287,6 +392,8 @@ public class GrappinSystem : MonoBehaviour
                 _Grappin.isGrappling = false;
                 _Grappin.Line.enabled = false;
             }
+            */
+            _Grappin.Joint.distance -= 0.03f;
         }
 
 
