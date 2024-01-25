@@ -31,8 +31,8 @@ public class GrappinSystem : MonoBehaviour
         public static float grappleSpeed = 5;
         public static float grappleShootSpeed = 60;
 
-        public static float SuperJumpPuissance = 1.5f;
-        public static float SuperJumpMaxPuissance = 500f;
+        public static float SuperJumpPuissance = 2.5f;
+        public static float SuperJumpMaxPuissance = 1100f;
         public static float SuperJumpTime = 7;
 
         public static float GrappinX = 0.2f;
