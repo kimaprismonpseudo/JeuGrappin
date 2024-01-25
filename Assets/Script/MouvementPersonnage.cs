@@ -11,7 +11,7 @@ public class MouvementPerosnnage : MonoBehaviour
     public Rigidbody2D rb;
     public SpriteRenderer Graphics;
     public static bool isGrapplingPlayer = false;
-
+    public Animator Animator;
 
     // Private 
     private Vector3 Velocity = Vector3.zero;
@@ -58,7 +58,7 @@ public class MouvementPerosnnage : MonoBehaviour
         else if (IsGrounded == true && isRespawn == false)
             this.SafePosSave = false;
 
-
+        this.Animator.SetFloat("Speed", this.rb.velocity.x < 0 ? this.rb.velocity.x * -1 : this.rb.velocity.x);
 
 
         if (isGrapplingPlayer)
@@ -112,6 +112,9 @@ public class MouvementPerosnnage : MonoBehaviour
 
     public IEnumerator InvincibilityFlash()
     {
+
+        
+
         for (; this.isRespawn;)
         {
             this.Graphics.color = new Color(1f, 1f, 1f, 0.3f);
