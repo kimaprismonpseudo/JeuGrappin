@@ -136,18 +136,16 @@ public class GrappinSystem : MonoBehaviour
             }
         }
 
-        private bool GetSomeOneIsGrappling()
+        public static bool GetSomeOneIsGrappling()
         {
-            bool aRenvoyer = false;
             foreach (GrappinSysChild g in MesGrappins)
             {
                 if (g.isGrapplingP)
                 {
-                    aRenvoyer = true;
+                    return true;
                 };
             }
-            GrappinSystem.animator.SetBool("IsGrapplingA",aRenvoyer);
-            return aRenvoyer ;
+            return false ;
         }
 
 
@@ -263,11 +261,11 @@ public class GrappinSystem : MonoBehaviour
 
     #endregion
 
-    public static Animator animator;
     private GrappinSysChild GrappinSys1;
     private GrappinSysChild GrappinSys2;
     private GrappinSysChild GrappinSysTest;
     public float Ralentissement;
+    public static Animator Animator;
 
     private List<GrappinSysChild> TabGrappinSys;
     private int Indexgrappin = -1;
@@ -303,6 +301,8 @@ public class GrappinSystem : MonoBehaviour
             Debug.Log("Grappin ON");
         else
             Debug.Log("Grappin OFF");
+
+        Animator = this.GetComponent<Animator>();
     }
 
     private bool InitGrappin()
@@ -336,6 +336,8 @@ public class GrappinSystem : MonoBehaviour
         GrappinSysChild.CheckCoolDown();
 
         BiblioGenerale.Ralentissement = this.Ralentissement;
+
+        GrappinSystem.Animator.SetBool("IsGrapplingA", GrappinSysChild.GetSomeOneIsGrappling() || !MouvementPerosnnage.IsGrounded);
 
         PressKeyUpdate();
 

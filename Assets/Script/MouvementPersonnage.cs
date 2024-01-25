@@ -59,6 +59,7 @@ public class MouvementPerosnnage : MonoBehaviour
             this.SafePosSave = false;
 
         this.Animator.SetFloat("Speed", this.rb.velocity.x < 0 ? this.rb.velocity.x * -1 : this.rb.velocity.x);
+        Debug.Log(this.rb.velocity.x < 0 ? this.rb.velocity.x * -1 : this.rb.velocity.x);
 
 
         if (isGrapplingPlayer)
