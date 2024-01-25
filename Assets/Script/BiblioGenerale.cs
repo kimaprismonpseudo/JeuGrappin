@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BiblioGenerale
+public class BiblioGenerale : MonoBehaviour
 {
-    public static float Ralentissement;
-   public static Vector2 GetVelociteGrappin(Vector2 _VelociteGrappin, Vector2 _VelocitePlayer)
+    [SerializeField] public static float Ralentissement;
+
+    public float ets;
+    public static Vector2 GetVelociteGrappin(Vector2 _VelociteGrappin, Vector2 _VelocitePlayer)
     {
         float x;
         float y = _VelociteGrappin.y * Ralentissement;
@@ -21,4 +23,27 @@ public class BiblioGenerale
 
         return new Vector2(x, y);
     }
+
+
+    //public void Start()
+    //{
+    //    StartCoroutine(Test());
+    //}
+
+
+    //public IEnumerator Test()
+    //{
+    //    Debug.Log("coucou");
+
+    //    yield return new WaitForSeconds(5);
+
+    //    Debug.Log("Test2");
+
+    //}
+
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.V))
+    //        StartCoroutine(Test());
+    //}
 }

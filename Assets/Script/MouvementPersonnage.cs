@@ -9,8 +9,9 @@ public class MouvementPerosnnage : MonoBehaviour
     // Public 
     public float moveSpeed = 3;
     public Rigidbody2D rb;
-    public SpriteRenderer FlipCheck;
+    public SpriteRenderer Graphics;
     public static bool isGrapplingPlayer = false;
+
 
     // Private 
     private Vector3 Velocity = Vector3.zero;
@@ -22,8 +23,11 @@ public class MouvementPerosnnage : MonoBehaviour
     public Transform GroundCheckL;
     public Transform GroundCheckR;
 
-    public bool IsGrounded = true;
-    
+    public static bool IsGrounded = true;
+    private bool isRespawn = false;
+
+    private bool SafePosSave = false;
+    private Vector2 PosBeforeDeath;
 
 
     // Start is called before the first frame update
@@ -43,11 +47,81 @@ public class MouvementPerosnnage : MonoBehaviour
         MAJPositionPlayer();
         MAJFlipPlayer();
 
-        this.IsGrounded = Physics2D.OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
+        IsGrounded =Physics2D .OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
+
+        if (IsGrounded == false && this.SafePosSave == false && isRespawn == false)
+        {
+            Debug.Log("Nouvelle Co");
+            this.SafePosSave = true;
+            this.PosBeforeDeath = new Vector2(transform.position.x + Input.GetAxisRaw("Horizontal")*-2, transform.position.y + 2);
+        }
+        else if (IsGrounded == true && isRespawn == false)
+            this.SafePosSave = false;
+
+
+
+
         if (isGrapplingPlayer)
             moveSpeed = 10;
         else
             moveSpeed = 3;
+    }
+
+
+
+    //public GameObject ObjectToDestroy;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("DeathZone"))
+        {
+            this.isRespawn = true;
+            StartCoroutine(GoToSafePos());
+
+        }
+    }
+
+
+    private IEnumerator GoToSafePos()
+    {
+        StartCoroutine(InvincibilityFlash());
+
+        float t = 0;
+        float time = 10;
+
+        Vector2 newPos;
+
+        Collider2D[] RB_Collider = new Collider2D[1];
+        this.rb.GetAttachedColliders(RB_Collider);
+        RB_Collider[0].enabled = false;
+
+        for (; t < time && Vector2.Distance(transform.position,this.PosBeforeDeath) > .5f; t += Time.deltaTime)
+        {
+            newPos = Vector2.Lerp(transform.position, this.PosBeforeDeath, t / time);
+
+            transform.position = newPos;
+            yield return null;
+        }
+
+        RB_Collider[0].enabled = true;
+        this.SafePosSave = false;
+        this.isRespawn = false;
+        this.rb.velocity = Vector2.zero;
+    }
+
+
+    public IEnumerator InvincibilityFlash()
+    {
+        for (; this.isRespawn;)
+        {
+            this.Graphics.color = new Color(1f, 1f, 1f, 0.3f);
+
+            yield return new WaitForSeconds(.15f);
+
+            this.Graphics.color = new Color(1f, 1f, 1f, 1f);
+
+            yield return new WaitForSeconds(.30f);
+        }
     }
 
 
@@ -64,7 +138,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
         Vector2 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
 
-        if (this.IsGrounded || isGrapplingPlayer)
+        if (IsGrounded || isGrapplingPlayer)
             this.rb.velocity = TargetVelocity;
 
         if (this.DebugC)
@@ -81,7 +155,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
     private void MAJFlipPlayer()
     {
-        this.FlipCheck.flipX = this.isFlip;
+        this.Graphics.flipX = this.isFlip;
     }
 
 
