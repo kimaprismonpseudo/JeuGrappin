@@ -9,6 +9,8 @@ public class GrappinSystem : MonoBehaviour
 
     #region Déclaration 
 
+   
+
     #region Classe GrappinSysChild
     private class GrappinSysChild
     {
@@ -136,12 +138,16 @@ public class GrappinSystem : MonoBehaviour
 
         private bool GetSomeOneIsGrappling()
         {
+            bool aRenvoyer = false;
             foreach (GrappinSysChild g in MesGrappins)
             {
                 if (g.isGrapplingP)
-                    return true;
+                {
+                    aRenvoyer = true;
+                };
             }
-            return false;
+            GrappinSystem.animator.SetBool("IsGrapplingA",aRenvoyer);
+            return aRenvoyer ;
         }
 
         public GrappinSysChild GetPasCeluila()
@@ -225,7 +231,7 @@ public class GrappinSystem : MonoBehaviour
                 Line.SetPosition(1, this.PosGrappinFin);
                 this.Joint.autoConfigureDistance = true;
                 this.Joint.enabled = true;
-                this.Joint.autoConfigureDistance = false;
+                this.Joint.autoConfigureDistance = false;    
             }
         }
 
@@ -254,9 +260,9 @@ public class GrappinSystem : MonoBehaviour
     };
 
 
-    #endregion 
+    #endregion
 
-
+    public static Animator animator;
     private GrappinSysChild GrappinSys1;
     private GrappinSysChild GrappinSys2;
     private GrappinSysChild GrappinSysTest;

@@ -134,9 +134,9 @@ public class MouvementPerosnnage : MonoBehaviour
         float Axis = Input.GetAxis("Horizontal");
         float horizontalMovement = Axis * this.moveSpeed;
 
-        if (Axis >= 0)
+        if (Axis > 0)
             this.isFlip = false;
-        else
+        else if (Axis < 0)
             this.isFlip = true;
 
         Vector2 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
