@@ -47,11 +47,12 @@ public class MouvementPerosnnage : MonoBehaviour
         MAJPositionPlayer();
         MAJFlipPlayer();
 
-        IsGrounded =Physics2D .OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
+       
+        IsGrounded = Physics2D .OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
 
         if (IsGrounded == false && this.SafePosSave == false && isRespawn == false)
         {
-            Debug.Log("Nouvelle Co");
+            //Debug.Log("Nouvelle Co");
             this.SafePosSave = true;
             this.PosBeforeDeath = new Vector2(transform.position.x + Input.GetAxisRaw("Horizontal")*-2, transform.position.y + 2);
         }
@@ -59,7 +60,7 @@ public class MouvementPerosnnage : MonoBehaviour
             this.SafePosSave = false;
 
         this.Animator.SetFloat("Speed", this.rb.velocity.x < 0 ? this.rb.velocity.x * -1 : this.rb.velocity.x);
-        Debug.Log(this.rb.velocity.x < 0 ? this.rb.velocity.x * -1 : this.rb.velocity.x);
+        //Debug.Log(this.rb.velocity.x < 0 ? this.rb.velocity.x * -1 : this.rb.velocity.x);
 
 
         if (isGrapplingPlayer)

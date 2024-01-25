@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BiblioGenerale : MonoBehaviour
+public static class BiblioGenerale
 {
     [SerializeField] public static float Ralentissement;
 
-    public float ets;
     public static Vector2 GetVelociteGrappin(Vector2 _VelociteGrappin, Vector2 _VelocitePlayer)
     {
         float x;
@@ -25,25 +24,13 @@ public class BiblioGenerale : MonoBehaviour
     }
 
 
-    //public void Start()
-    //{
-    //    StartCoroutine(Test());
-    //}
+    public static bool GetInput(bool _value, int _Input)
+    { 
+        _value = ((Input.GetMouseButtonDown(_Input) || _value) && Input.GetMouseButton(_Input)) || (MouvementPerosnnage.IsGrounded && Input.GetMouseButton(_Input) && !GrappinSystem.GrappinSysChild.isSuperGrapple);
+        Debug.Log(GrappinSystem.GrappinSysChild.isSuperGrapple);
+        return _value;
+        //if (MouvementPerosnnage.IsGrounded)
+        //    _value = Input.GetMouseButton(_Input);
+    }
 
-
-    //public IEnumerator Test()
-    //{
-    //    Debug.Log("coucou");
-
-    //    yield return new WaitForSeconds(5);
-
-    //    Debug.Log("Test2");
-
-    //}
-
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.V))
-    //        StartCoroutine(Test());
-    //}
 }
