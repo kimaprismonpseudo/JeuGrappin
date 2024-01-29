@@ -27,7 +27,7 @@ public static class BiblioGenerale
     public static bool GetInput(bool _value, int _Input)
     { 
         _value = ((Input.GetMouseButtonDown(_Input) || _value) && Input.GetMouseButton(_Input)) || (MouvementPerosnnage.IsGrounded && Input.GetMouseButton(_Input) && !GrappinSystem.GrappinSysChild.isSuperGrapple);
-        Debug.Log(GrappinSystem.GrappinSysChild.isSuperGrapple);
+        //Debug.Log(GrappinSystem.GrappinSysChild.isSuperGrapple);
         return _value;
         //if (MouvementPerosnnage.IsGrounded)
         //    _value = Input.GetMouseButton(_Input);

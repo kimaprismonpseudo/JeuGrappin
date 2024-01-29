@@ -87,7 +87,7 @@ public class MouvementPerosnnage : MonoBehaviour
     private IEnumerator GoToSafePos()
     {
         StartCoroutine(InvincibilityFlash());
-
+        GrappinSystem.GrappinSysChild.SetOFFGrapples();
         float t = 0;
         float time = 10;
 
@@ -95,7 +95,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
         Collider2D[] RB_Collider = new Collider2D[1];
         this.rb.GetAttachedColliders(RB_Collider);
-        RB_Collider[0].enabled = false;
+        //RB_Collider[0].enabled = false;
 
         for (; t < time && Vector2.Distance(transform.position,this.PosBeforeDeath) > .5f; t += Time.deltaTime)
         {

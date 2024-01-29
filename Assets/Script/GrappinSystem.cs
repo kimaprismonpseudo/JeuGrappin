@@ -20,6 +20,8 @@ public class GrappinSystem : MonoBehaviour
         public static LayerMask GrappleMask;
         public Rigidbody2D RB;
         public GameObject Origine;
+        public GameObject AccrocheP;
+        public Vector2 PointAccroche;
 
         private bool isGrapplingP = false;
         public bool retracting = false;
@@ -135,6 +137,19 @@ public class GrappinSystem : MonoBehaviour
             get
             {
                 return SomeOneGrapplingP;
+            }
+        }
+
+        public Vector2 Accroche
+        {
+            get
+            {
+                return new Vector2(this.AccrocheP.transform.position.x + PointAccroche.x, this.AccrocheP.transform.position.y + PointAccroche.y);
+            }
+
+            set
+            {
+                this.target = value;
             }
         }
 
@@ -500,12 +515,14 @@ public class GrappinSystem : MonoBehaviour
         if (_Grappin.Line.enabled)
         {
             _Grappin.Line.SetPosition(0, GrappinSysChild.PosGrappinStart);
+            _Grappin.Line.SetPosition(1, _Grappin.AccrocheP == null ? _Grappin.PosGrappinFin : _Grappin.Accroche);
+
         }
 
         if (Vector2.Distance(GrappinSysChild.PosGrappinStart, _Grappin.PosGrappinFin) > GrappinSysChild.maxdistance || (!this.PressKey[_Grappin.KeyAssocie]))
             _Grappin.SetOFFGrapple();
 
-        _Grappin.Joint.connectedAnchor = _Grappin.PosGrappinFin;
+        _Grappin.Joint.connectedAnchor = _Grappin.AccrocheP == null ? _Grappin.PosGrappinFin : _Grappin.Accroche;
         _Grappin.Joint.anchor = new Vector2(GrappinSysChild.JointX, GrappinSysChild.JointY);
     }
 
@@ -560,6 +577,12 @@ public class GrappinSystem : MonoBehaviour
         {
             _Grappin.isGrappling = true;
             _Grappin.target = hit.point;
+            _Grappin.AccrocheP = hit.collider.gameObject;
+
+            float x = hit.point.x - _Grappin.AccrocheP.transform.position.x;
+            float y = hit.point.y - _Grappin.AccrocheP.transform.position.y;
+            _Grappin.PointAccroche = new Vector2(x, y);
+
             _Grappin.Line.enabled = true;
             _Grappin.Line.positionCount = 2;
 
