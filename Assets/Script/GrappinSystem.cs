@@ -294,6 +294,7 @@ public class GrappinSystem : MonoBehaviour
     private GrappinSysChild GrappinSysTest;
     public float Ralentissement;
     public static Animator Animator;
+    public GameObject MonCurseur;
 
     private List<GrappinSysChild> TabGrappinSys;
     private int Indexgrappin = -1;
@@ -304,7 +305,7 @@ public class GrappinSystem : MonoBehaviour
     public enum Clic {MGauche, MDroit, Espace, DGauche, DDroit, InfoDirection};
     // Mouse Gauche , Mouse Droit, Espace, Deplacement Gauche, Deplacement Droit
 
-    private Dictionary<Clic, bool> PressKey = new Dictionary<Clic, bool>() 
+    public static Dictionary<Clic, bool> PressKey = new Dictionary<Clic, bool>() 
     { 
         { Clic.MGauche, false }, 
         { Clic.MDroit, false }, 
@@ -370,6 +371,8 @@ public class GrappinSystem : MonoBehaviour
 
         GrappinSystem.Animator.SetBool("IsGrapplingA", GrappinSysChild.GetSomeOneIsGrappling() || !MouvementPerosnnage.IsGrounded);
 
+        CursorPos();
+
         PressKeyUpdate();
 
         Balancement();
@@ -393,7 +396,7 @@ public class GrappinSystem : MonoBehaviour
     }
     private void BalancementChild(ref GrappinSysChild _Grappin)
     {
-        if (_Grappin.isGrappling && GrappinSysChild.isSuperGrapple == false)
+        if (_Grappin.isGrappling && GrappinSysChild.isSuperGrapple == false && MouvementPerosnnage.isClimb == false)
         {
             _Grappin.RB.AddForce(BiblioGenerale.GetVelociteGrappin(_Grappin.RB.velocity, this.Player.velocity));
             PositionUpdateAll(ref _Grappin);
@@ -407,7 +410,7 @@ public class GrappinSystem : MonoBehaviour
 
     private void PositionUpdateAll()
     {
-        if (GrappinSysChild.SomeOneGrappling == false)
+        if (GrappinSysChild.SomeOneGrappling == false || MouvementPerosnnage.isClimb)
         {
             this.GrappinSys1.Origine.transform.position = this.transform.position;
             this.GrappinSys2.Origine.transform.position = this.transform.position;
@@ -429,22 +432,22 @@ public class GrappinSystem : MonoBehaviour
 
     private void PressKeyUpdate()
     {
-        this.PressKey[Clic.MGauche] = BiblioGenerale.GetInput(this.PressKey[Clic.MGauche], 0);
-        this.PressKey[Clic.MDroit] = BiblioGenerale.GetInput(this.PressKey[Clic.MDroit], 1);
-        this.PressKey[Clic.Espace] = Input.GetKey(KeyCode.Space);
+        PressKey[Clic.MGauche] = BiblioGenerale.GetInput(PressKey[Clic.MGauche], 0);
+        PressKey[Clic.MDroit] = BiblioGenerale.GetInput(PressKey[Clic.MDroit], 1);
+        PressKey[Clic.Espace] = Input.GetKey(KeyCode.Space);
 
         switch (Input.GetAxisRaw("Horizontal"))
         {
 
             case (1):
-                this.PressKey[Clic.DDroit] = true;
-                this.PressKey[Clic.DGauche] = false;
+                PressKey[Clic.DDroit] = true;
+                PressKey[Clic.DGauche] = false;
                 break;
 
 
             case (-1):
-                this.PressKey[Clic.DDroit] = false;
-                this.PressKey[Clic.DGauche] = true;
+                PressKey[Clic.DDroit] = false;
+                PressKey[Clic.DGauche] = true;
                 break;
 
 
@@ -453,13 +456,13 @@ public class GrappinSystem : MonoBehaviour
                 // Donc on verifie une seul touche pour savoir
                 if (Input.GetKey(KeyCode.D))
                 {
-                    this.PressKey[Clic.DDroit] = true;
-                    this.PressKey[Clic.DGauche] = true;
+                    PressKey[Clic.DDroit] = true;
+                    PressKey[Clic.DGauche] = true;
                 }
                 else
                 {
-                    this.PressKey[Clic.DDroit] = false;
-                    this.PressKey[Clic.DGauche] = false;
+                    PressKey[Clic.DDroit] = false;
+                    PressKey[Clic.DGauche] = false;
                 }
                 break;
         }
@@ -473,30 +476,30 @@ public class GrappinSystem : MonoBehaviour
 
     private void GrappinChildUpdate(ref GrappinSysChild _Grappin)
     {
-        if(this.PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling == false && _Grappin.CanGrapple)
+        if(PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling == false && _Grappin.CanGrapple)
         {
             StartGrapple(ref _Grappin);
         }
 
-        if (!this.PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling)
+        if (!PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling)
         {
             EndGrapple(ref _Grappin);
         }
 
-        if (this.PressKey[Clic.Espace] && GetAllIsGrappling() && GrappinSysChild.isSuperGrapple == false && MouvementPerosnnage.IsGrounded && GrappinSysChild.CanSuperJump)
+        if (PressKey[Clic.Espace] && GetAllIsGrappling() && GrappinSysChild.isSuperGrapple == false && MouvementPerosnnage.IsGrounded && GrappinSysChild.CanSuperJump)
         {
             Debug.Log("SuperJump");
             GrappinSysChild.isSuperGrapple = true;
             SuperGrapple();
         }
 
-        if (this.PressKey[Clic.Espace] && _Grappin.isGrappling && GrappinSysChild.isSuperGrapple == false)
+        if (PressKey[Clic.Espace] && _Grappin.isGrappling && GrappinSysChild.isSuperGrapple == false)
         {
            // Debug.Log("Pret");
             _Grappin.retracting = true;
         }
 
-        if (this.PressKey[Clic.Espace] == false && _Grappin.retracting)
+        if (PressKey[Clic.Espace] == false && _Grappin.retracting)
         {
             _Grappin.retracting = false;
         }
@@ -519,7 +522,7 @@ public class GrappinSystem : MonoBehaviour
 
         }
 
-        if (Vector2.Distance(GrappinSysChild.PosGrappinStart, _Grappin.PosGrappinFin) > GrappinSysChild.maxdistance || (!this.PressKey[_Grappin.KeyAssocie]))
+        if (Vector2.Distance(GrappinSysChild.PosGrappinStart, _Grappin.PosGrappinFin) > GrappinSysChild.maxdistance || (!PressKey[_Grappin.KeyAssocie]))
             _Grappin.SetOFFGrapple();
 
         _Grappin.Joint.connectedAnchor = _Grappin.AccrocheP == null ? _Grappin.PosGrappinFin : _Grappin.Accroche;
@@ -537,10 +540,11 @@ public class GrappinSystem : MonoBehaviour
         if (_Grappin.retracting)
         {
             _Grappin.Joint.distance -= 0.03f;
+            MouvementPerosnnage.isClimb = false;
         }
 
 
-        if (!this.PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling)
+        if (!PressKey[_Grappin.KeyAssocie] && _Grappin.isGrappling)
         {
             if (Vector2.Distance(GrappinSysChild.PosGrappinStart, _Grappin.PosGrappinFin) < 1f)
             {
@@ -554,12 +558,12 @@ public class GrappinSystem : MonoBehaviour
 
     private void Flip()
     {
-        if (this.PressKey[Clic.DGauche])
+        if (PressKey[Clic.DGauche])
         {
             GrappinSysChild.GrappinX = Mathf.Abs(GrappinSysChild.GrappinX);
             GrappinSysChild.JointX = Mathf.Abs(GrappinSysChild.JointX);
         }
-        else if (this.PressKey[Clic.DDroit])
+        else if (PressKey[Clic.DDroit])
         {
             GrappinSysChild.GrappinX = Mathf.Abs(GrappinSysChild.GrappinX) * -1;
             GrappinSysChild.JointX = Mathf.Abs(GrappinSysChild.JointX) * -1;
@@ -586,9 +590,27 @@ public class GrappinSystem : MonoBehaviour
             _Grappin.Line.enabled = true;
             _Grappin.Line.positionCount = 2;
 
-            StartCoroutine(_Grappin.Grapple(this.PressKey[_Grappin.KeyAssocie]));
+            StartCoroutine(_Grappin.Grapple(PressKey[_Grappin.KeyAssocie]));
         }
     }
+
+    private void CursorPos()
+    {
+        Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, GrappinSysChild.maxdistance, GrappinSysChild.GrappleMask);
+
+        if (hit.collider != null && GetAllIsGrappling() == false)
+        {
+            MonCurseur.GetComponent<SpriteRenderer>().enabled = true;
+            MonCurseur.transform.position = hit.point;
+        }
+        else
+        {
+            MonCurseur.GetComponent<SpriteRenderer>().enabled = false;
+        }
+    }
+
 
     private void EndGrapple(ref GrappinSysChild _Grappin)
     {
@@ -648,15 +670,15 @@ public class GrappinSystem : MonoBehaviour
 
         float NewVelocity = 0;
 
-        for (; this.PressKey[_KeyAssocieSuperJump] && NewVelocity <= GrappinSysChild.SuperJumpMaxPuissance; t += Time.deltaTime)
+        for (; PressKey[_KeyAssocieSuperJump] && NewVelocity <= GrappinSysChild.SuperJumpMaxPuissance; t += Time.deltaTime)
         {
             NewVelocity += GrappinSysChild.SuperJumpPuissance;
             NewVelocity = Mathf.Min(NewVelocity, GrappinSysChild.SuperJumpMaxPuissance);
             yield return null;
         }
         GrappinSysChild.SetOFFGrapples(false, false, true, false);
-        this.PressKey[Clic.MGauche] = false;
-        this.PressKey[Clic.MDroit] = false;
+        PressKey[Clic.MGauche] = false;
+        PressKey[Clic.MDroit] = false;
         this.Player.AddForce(new Vector2(0, NewVelocity));
         GrappinSysChild.ResetTimeCanSuperJump();
         yield return new WaitForSeconds(0.5f);

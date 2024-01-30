@@ -24,7 +24,8 @@ public class MouvementPerosnnage : MonoBehaviour
     public Transform GroundCheckR;
 
     public static bool IsGrounded = true;
-    private bool isRespawn = false;
+    private static bool isRespawn = false;
+    public static bool isClimb;
 
     private bool SafePosSave = false;
     private Vector2 PosBeforeDeath;
@@ -46,9 +47,8 @@ public class MouvementPerosnnage : MonoBehaviour
       //  MAJDebugConsole();
         MAJPositionPlayer();
         MAJFlipPlayer();
-
        
-        IsGrounded = Physics2D .OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
+        IsGrounded = Physics2D.OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
 
         if (IsGrounded == false && this.SafePosSave == false && isRespawn == false)
         {
@@ -75,13 +75,29 @@ public class MouvementPerosnnage : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("DeathZone"))
+        switch (collision.tag)
         {
-            this.isRespawn = true;
-            StartCoroutine(GoToSafePos());
+            case "DeathZone":
+                isRespawn = true;
+                StartCoroutine(GoToSafePos());
+                break;
 
+            case "Climbable":
+                isClimb = true;
+                break;
         }
     }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        switch (collision.tag)
+        {
+            case "Climbable":
+                isClimb = false;
+                break;
+        }
+    }
+
 
 
     private IEnumerator GoToSafePos()
@@ -95,10 +111,11 @@ public class MouvementPerosnnage : MonoBehaviour
 
         Collider2D[] RB_Collider = new Collider2D[1];
         this.rb.GetAttachedColliders(RB_Collider);
-        //RB_Collider[0].enabled = false;
+        RB_Collider[0].enabled = false;
 
         for (; t < time && Vector2.Distance(transform.position,this.PosBeforeDeath) > .5f; t += Time.deltaTime)
         {
+            GrappinSystem.GrappinSysChild.SetOFFGrapples();
             newPos = Vector2.Lerp(transform.position, this.PosBeforeDeath, t / time);
 
             transform.position = newPos;
@@ -107,17 +124,15 @@ public class MouvementPerosnnage : MonoBehaviour
 
         RB_Collider[0].enabled = true;
         this.SafePosSave = false;
-        this.isRespawn = false;
+        isRespawn = false;
         this.rb.velocity = Vector2.zero;
+        GrappinSystem.GrappinSysChild.SetOFFGrapples();
     }
 
 
     public IEnumerator InvincibilityFlash()
     {
-
-        
-
-        for (; this.isRespawn;)
+        for (; isRespawn;)
         {
             this.Graphics.color = new Color(1f, 1f, 1f, 0.3f);
 
@@ -143,7 +158,7 @@ public class MouvementPerosnnage : MonoBehaviour
 
         Vector2 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
 
-        if (IsGrounded || isGrapplingPlayer)
+        if (IsGrounded || isGrapplingPlayer || isClimb)
             this.rb.velocity = TargetVelocity;
 
         if (this.DebugC)
