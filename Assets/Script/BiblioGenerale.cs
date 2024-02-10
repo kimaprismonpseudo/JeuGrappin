@@ -5,6 +5,7 @@ using UnityEngine;
 public static class BiblioGenerale
 {
     [SerializeField] public static float Ralentissement;
+    public static bool WaitRelachement;
 
     public static Vector2 GetVelociteGrappin(Vector2 _VelociteGrappin, Vector2 _VelocitePlayer)
     {
@@ -25,8 +26,15 @@ public static class BiblioGenerale
 
 
     public static bool GetInput(bool _value, int _Input)
-    { 
-        _value = ((Input.GetMouseButtonDown(_Input) || _value) && Input.GetMouseButton(_Input)) || (MouvementPerosnnage.IsGrounded && Input.GetMouseButton(_Input) && !GrappinSystem.GrappinSysChild.isSuperGrapple);
+    {
+        if (WaitRelachement)
+            WaitRelachement = !Input.GetMouseButtonUp(_Input);
+        else
+            WaitRelachement = GrappinSystem.GrappinSysChild.isSuperGrapple;
+
+        if (!WaitRelachement)
+            _value = ((Input.GetMouseButtonDown(_Input) || _value) && Input.GetMouseButton(_Input)) || (MouvementPersonnage.IsGrounded && Input.GetMouseButton(_Input) && !GrappinSystem.GrappinSysChild.isSuperGrapple);
+
         return _value;
     }
 

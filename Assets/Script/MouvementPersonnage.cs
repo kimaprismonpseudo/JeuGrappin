@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class MouvementPerosnnage : MonoBehaviour
+public class MouvementPersonnage : MonoBehaviour
 {
 
     // Public 
@@ -35,7 +35,7 @@ public class MouvementPerosnnage : MonoBehaviour
     void Start()
     {
         //this.isFlip = false;
-        Debug.Log("MouvementPerosnnage - Debut");
+        Debug.Log("MouvementPersonnage - Debut");
 
         this.rb.freezeRotation = true;
 
@@ -152,14 +152,17 @@ public class MouvementPerosnnage : MonoBehaviour
         float horizontalMovement = Axis * this.moveSpeed;
 
         if (Axis > 0)
-            this.isFlip = false;
+            this.isFlip = GrappinSystem.GrappinSysChild.isSuperGrapple;
         else if (Axis < 0)
-            this.isFlip = true;
+            this.isFlip = !GrappinSystem.GrappinSysChild.isSuperGrapple;
+
 
         Vector2 TargetVelocity = new Vector2(horizontalMovement, this.rb.velocity.y);
 
-        if (IsGrounded || isGrapplingPlayer || isClimb)
+        if ((IsGrounded || isGrapplingPlayer || isClimb) && GrappinSystem.GrappinSysChild.isSuperGrapple == false)
+        {
             this.rb.velocity = TargetVelocity;
+        }
 
         if (this.DebugC)
             Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));

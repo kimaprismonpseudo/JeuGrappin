@@ -108,7 +108,7 @@ public class GrappinSystem : MonoBehaviour
             {
                 this.isGrapplingP = value;
                 SomeOneGrapplingP = GetSomeOneIsGrappling();
-                MouvementPerosnnage.isGrapplingPlayer = SomeOneGrappling;
+                MouvementPersonnage.isGrapplingPlayer = SomeOneGrappling;
                 if (value == false)
                     this.PosGrappinFin = PosGrappinStart;
             }
@@ -369,7 +369,7 @@ public class GrappinSystem : MonoBehaviour
 
         BiblioGenerale.Ralentissement = this.Ralentissement;
 
-        GrappinSystem.Animator.SetBool("IsGrapplingA", GrappinSysChild.GetSomeOneIsGrappling() || !MouvementPerosnnage.IsGrounded);
+        GrappinSystem.Animator.SetBool("IsGrapplingA", GrappinSysChild.GetSomeOneIsGrappling() || !MouvementPersonnage.IsGrounded);
 
         CursorPos();
 
@@ -396,7 +396,7 @@ public class GrappinSystem : MonoBehaviour
     }
     private void BalancementChild(ref GrappinSysChild _Grappin)
     {
-        if (_Grappin.isGrappling && GrappinSysChild.isSuperGrapple == false && MouvementPerosnnage.isClimb == false)
+        if (_Grappin.isGrappling && GrappinSysChild.isSuperGrapple == false && MouvementPersonnage.isClimb == false)
         {
             _Grappin.RB.AddForce(BiblioGenerale.GetVelociteGrappin(_Grappin.RB.velocity, this.Player.velocity));
             PositionUpdateAll(ref _Grappin);
@@ -410,7 +410,7 @@ public class GrappinSystem : MonoBehaviour
 
     private void PositionUpdateAll()
     {
-        if (GrappinSysChild.SomeOneGrappling == false || MouvementPerosnnage.isClimb)
+        if (GrappinSysChild.SomeOneGrappling == false || MouvementPersonnage.isClimb)
         {
             this.GrappinSys1.Origine.transform.position = this.transform.position;
             this.GrappinSys2.Origine.transform.position = this.transform.position;
@@ -486,9 +486,9 @@ public class GrappinSystem : MonoBehaviour
             EndGrapple(ref _Grappin);
         }
 
-        if (PressKey[Clic.Espace] && GetAllIsGrappling() && GrappinSysChild.isSuperGrapple == false && MouvementPerosnnage.IsGrounded && GrappinSysChild.CanSuperJump)
+        if (PressKey[Clic.Espace] && GetAllIsGrappling() && GrappinSysChild.isSuperGrapple == false && MouvementPersonnage.IsGrounded && GrappinSysChild.CanSuperJump)
         {
-            Debug.Log("SuperJump");
+            //Debug.Log("SuperJump");
             GrappinSysChild.isSuperGrapple = true;
             SuperGrapple();
         }
@@ -540,7 +540,7 @@ public class GrappinSystem : MonoBehaviour
         if (_Grappin.retracting)
         {
             _Grappin.Joint.distance -= 0.03f;
-            MouvementPerosnnage.isClimb = false;
+            MouvementPersonnage.isClimb = false;
         }
 
 
@@ -629,20 +629,33 @@ public class GrappinSystem : MonoBehaviour
     {
         if (this.GetPosGrappinTop())
         {
-            //Debug.Log("GrappinPos - OK");
+            Debug.Log("SuperJump - OK");
             StartCoroutine(SuperJumpGrapple(Clic.Espace));
+        }
+        else if (this.GetPosGrappinMid())
+        {
+            Debug.Log("SuperBoost - OK");
+            StartCoroutine(SuperBoostGrapple());
         }
         else
         {
-           // SuperBoostGrapple(ref _Grappin, (int)Input.GetAxisRaw("Horizontal"));
+            Debug.Log("SuperGrapple - Pas OK");
         }
+    }
+
+    private bool GetPosGrappinMid()
+    {
+        if (this.GetPosGrappinTop() == true)
+            return false;
+
+        return ((this.GrappinSys1.Joint.connectedAnchor.y <= (this.transform.position.y)) != (this.GrappinSys2.Joint.connectedAnchor.y <= (this.transform.position.y)));
     }
 
     private bool GetPosGrappinTop()
     {
         // Renvoie Vrai si les Grappins sont au dessus du joueur
 
-        foreach(GrappinSysChild g in this.TabGrappinSys)
+        foreach (GrappinSysChild g in this.TabGrappinSys)
         {
             if (g.Joint.connectedAnchor.y <= (this.transform.position.y + this.HauteurMinSuperJump))
                 return false;
@@ -687,13 +700,31 @@ public class GrappinSystem : MonoBehaviour
 
 
 
-    private void SuperBoostGrapple(ref GrappinSysChild _Grappin, int _Direction)
+    private IEnumerator SuperBoostGrapple()
     {
-        // Direction : -1 Gauche , 1 Droite 
-        if (_Direction == -1 || _Direction == 1)
-        {
+        int Direction;
+        Debug.Log("Rentrer");
+        float t = 0;
+        float time = GrappinSysChild.SuperJumpTime;
 
+        float NewVelocity = 0;
+
+        for (;PressKey[Clic.Espace] && (NewVelocity <= GrappinSysChild.SuperJumpMaxPuissance || NewVelocity >= -GrappinSysChild.SuperJumpMaxPuissance); t += Time.deltaTime)
+        {
+            Direction = (int)Input.GetAxisRaw("Horizontal");
+            NewVelocity += GrappinSysChild.SuperJumpPuissance * Direction;
+            Debug.Log("Accumulation" + NewVelocity);
+            NewVelocity = Mathf.Clamp(NewVelocity, -GrappinSysChild.SuperJumpMaxPuissance, GrappinSysChild.SuperJumpMaxPuissance);
+            yield return null;
         }
+        GrappinSysChild.SetOFFGrapples(false, false, true, false);
+        PressKey[Clic.MGauche] = false;
+        PressKey[Clic.MDroit] = false;
+        Debug.Log("NewVelocity " + -NewVelocity);
+        this.Player.AddForce(new Vector2(-NewVelocity, Mathf.Abs((NewVelocity * 10) / 100 )));
+        GrappinSysChild.ResetTimeCanSuperJump();
+        yield return new WaitForSeconds(0.5f);
+        GrappinSysChild.isSuperGrapple = false;
     }
 
     
