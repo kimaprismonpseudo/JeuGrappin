@@ -12,11 +12,14 @@ public class MouvementPersonnage : MonoBehaviour
     public SpriteRenderer Graphics;
     public static bool isGrapplingPlayer = false;
     public Animator Animator;
+    public Vector2 CoorReset;
+    public float TimeForReset;
 
     // Private 
     private Vector3 Velocity = Vector3.zero;
     private bool DebugC = false;
     private bool isFlip;
+
 
     public GrappinSystem Grappin;
 
@@ -167,6 +170,20 @@ public class MouvementPersonnage : MonoBehaviour
         if (this.DebugC)
             Debug.Log(string.Format("Axis : {0} , DeltaTime : {1} , horizontalMovement : {2}", Input.GetAxis("Horizontal"), Time.deltaTime, horizontalMovement));
 
+        if (Input.GetKeyDown(KeyCode.R))
+            StartCoroutine(WaitReset());
+    }
+
+
+    private IEnumerator WaitReset()
+    {
+        for (float Timef = 0; Timef < this.TimeForReset && Input.GetKey(KeyCode.R); Timef += Time.deltaTime)
+        {
+            yield return null;
+            Debug.Log(Timef);
+        }
+        if (Input.GetKey(KeyCode.R))
+            this.rb.transform.position = this.CoorReset;
     }
 
     private void MAJDebugConsole()

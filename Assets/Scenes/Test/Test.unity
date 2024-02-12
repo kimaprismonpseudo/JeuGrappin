@@ -874,6 +874,8 @@ MonoBehaviour:
   rb: {fileID: 167431231}
   Graphics: {fileID: 167431228}
   Animator: {fileID: 167431227}
+  CoorReset: {x: 0, y: 0}
+  TimeForReset: 5
   Grappin: {fileID: 167431233}
   GroundCheckL: {fileID: 656457198}
   GroundCheckR: {fileID: 1900032678}
@@ -1915,6 +1917,8 @@ MonoBehaviour:
   rb: {fileID: 748231769}
   Graphics: {fileID: 0}
   Animator: {fileID: 0}
+  CoorReset: {x: 0, y: 0}
+  TimeForReset: 0
   Grappin: {fileID: 0}
   GroundCheckL: {fileID: 0}
   GroundCheckR: {fileID: 0}
