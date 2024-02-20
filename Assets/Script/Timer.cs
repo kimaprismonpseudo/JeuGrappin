@@ -5,42 +5,43 @@ using UnityEngine.UI;
 
 public class Timer : MonoBehaviour
 {
-    public Text TempsGraphique;
-    public float TempsCalcul;
+    public static Text TempsGraphique;
+    public static float TempsCalcul;
 
 
-    public float TempsCalculP
+    public static float TempsCalculP
     {
-        get => this.TempsCalcul; 
+        get => TempsCalcul; 
         set
         {
-            this.TempsCalcul += value;
+            TempsCalcul += value;
             if (value == 0)
-                this.TempsCalcul = 0;
+                TempsCalcul = 0;
 
-            this.TempsGraphique.text = TimerVersString();
+            TempsGraphique.text = TimerVersString();
         }
     }
     
     // Start is called before the first frame update
     void Start()
     {
+        TempsGraphique = GetComponent<Text>();
         ResetChrono();
     }
 
     // Update is called once per frame
     void Update()
     {
-        this.TempsCalculP = Time.deltaTime;
+        TempsCalculP = Time.deltaTime;
     }
 
-    public void ResetChrono()
+    public static void ResetChrono()
     {
-        this.TempsGraphique.text = "00:00";
-        this.TempsCalculP = 0;
+        TempsGraphique.text = "00:00";
+        TempsCalculP = 0;
     }
 
-    public string TimerVersString()
+    public static string TimerVersString()
     {
         string sMinutes, sSecondes;
         int Minutes, Secondes;

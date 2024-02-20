@@ -10,6 +10,7 @@ public class background : MonoBehaviour
     public Rigidbody2D rb;
     public float hauteurMax;
     public float velocityMax;
+    private float hauteurdebase;
 
 
     [SerializeField]
@@ -18,7 +19,11 @@ public class background : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        bgRenderer.material.mainTextureOffset += new Vector2(0, 0.5f);
+        hauteurdebase = rb.transform.position.y;
+        Debug.Log(hauteurdebase);
+        Debug.Log(rb.transform.position.y);
+        Debug.Log(rb.transform.position.y - hauteurdebase);
     }
 
     // Update is called once per frame
@@ -26,13 +31,9 @@ public class background : MonoBehaviour
     {
         if (MouvementPersonnage.isClimb == false)
         {
-            //velocityMax = rb.velocity.y > 0 ? Mathf.Max(velocityMax,rb.velocity.y) : velocityMax;
+            bgRenderer.material.mainTextureOffset = new Vector2(bgRenderer.material.mainTextureOffset.x + rb.velocity.x * speed * Time.deltaTime, (rb.transform.position.y - hauteurdebase) * speed2);
 
-            //bgRenderer.material.mainTextureOffset += new Vector2(rb.velocity.x * speed * Time.deltaTime, (rb.velocity.y > 0 ? rb.velocity.y : rb.velocity.y/2) * speed2 * Time.deltaTime);
-            
-            bgRenderer.material.mainTextureOffset = new Vector2(0, hauteurMax);
-
-            Debug.Log(bgRenderer.material.mainTextureOffset.y);
+            Debug.Log($"T : {bgRenderer.material.mainTextureOffset.y}");
         } 
         else
         {

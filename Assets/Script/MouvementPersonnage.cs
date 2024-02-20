@@ -185,7 +185,10 @@ public class MouvementPersonnage : MonoBehaviour
             Debug.Log(Timef);
         }
         if (Input.GetKey(KeyCode.R))
+        {
             this.rb.transform.position = this.CoorReset;
+            Timer.ResetChrono();
+        }
     }
 
     private void MAJDebugConsole()
