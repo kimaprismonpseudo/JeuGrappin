@@ -30,7 +30,7 @@ public class background : MonoBehaviour
 
             //bgRenderer.material.mainTextureOffset += new Vector2(rb.velocity.x * speed * Time.deltaTime, (rb.velocity.y > 0 ? rb.velocity.y : rb.velocity.y/2) * speed2 * Time.deltaTime);
             
-            bgRenderer.material.mainTextureOffset += new Vector2(0, hauteurMax);
+            bgRenderer.material.mainTextureOffset = new Vector2(0, hauteurMax);
 
             Debug.Log(bgRenderer.material.mainTextureOffset.y);
         } 
