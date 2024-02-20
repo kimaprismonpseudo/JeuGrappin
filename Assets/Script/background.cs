@@ -26,12 +26,10 @@ public class background : MonoBehaviour
     {
         if (MouvementPersonnage.isClimb == false)
         {
-            velocityMax = rb.velocity.y > 0 ? Mathf.Max(velocityMax,rb.velocity.y) : velocityMax;
+            //velocityMax = rb.velocity.y > 0 ? Mathf.Max(velocityMax,rb.velocity.y) : velocityMax;
 
-            if(bgRenderer.material.mainTextureOffset.y  > hauteurMax )
-                bgRenderer.material.mainTextureOffset += new Vector2(rb.velocity.x * speed * Time.deltaTime, 0);
-            else
-                bgRenderer.material.mainTextureOffset += new Vector2(rb.velocity.x * speed * Time.deltaTime, Mathf.Min(velocityMax,rb.velocity.y) * speed2 * Time.deltaTime);
+            bgRenderer.material.mainTextureOffset += new Vector2(rb.velocity.x * speed * Time.deltaTime, (rb.velocity.y > 0 ? rb.velocity.y : rb.velocity.y/2) * speed2 * Time.deltaTime);
+
             Debug.Log(bgRenderer.material.mainTextureOffset.y);
         } 
         else
