@@ -1661,6 +1661,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c93c4637afe4234f9b5d3d9ab507698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TempsGraphique: {fileID: 566667475}
+  TempsCalcul: 0
 --- !u!1 &579976741
 GameObject:
   m_ObjectHideFlags: 0
@@ -3203,6 +3205,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+<<<<<<< HEAD:Assets/Scenes/Test/LVL1.unity
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &841320752
 GameObject:
@@ -3236,6 +3239,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2038181328}
+=======
+>>>>>>> parent of 3a6ec07 (Menu Jeu):Assets/Scenes/Test/Test.unity
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &841320754
 BoxCollider2D:
@@ -4918,6 +4923,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+<<<<<<< HEAD:Assets/Scenes/Test/LVL1.unity
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1315971862
 GameObject:
@@ -5048,6 +5054,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+=======
+>>>>>>> parent of 3a6ec07 (Menu Jeu):Assets/Scenes/Test/Test.unity
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1337322162
 GameObject:
@@ -6548,6 +6556,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+<<<<<<< HEAD:Assets/Scenes/Test/LVL1.unity
 --- !u!1 &1881042341
 GameObject:
   m_ObjectHideFlags: 0
@@ -6678,6 +6687,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+=======
+>>>>>>> parent of 3a6ec07 (Menu Jeu):Assets/Scenes/Test/Test.unity
 --- !u!1 &1900032677
 GameObject:
   m_ObjectHideFlags: 0
