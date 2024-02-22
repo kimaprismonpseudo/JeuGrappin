@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 public class MouvementPersonnage : MonoBehaviour
 {
@@ -20,6 +21,9 @@ public class MouvementPersonnage : MonoBehaviour
     private Vector3 Velocity = Vector3.zero;
     private bool DebugC = false;
     private bool isFlip;
+
+    public Canvas Menu;
+    public Canvas Chrono;
 
 
     public GrappinSystem Grappin;
@@ -40,6 +44,7 @@ public class MouvementPersonnage : MonoBehaviour
     {
         //this.isFlip = false;
         Debug.Log("MouvementPersonnage - Debut");
+        this.Menu.gameObject.SetActive(false);
 
         this.rb.freezeRotation = true;
 
@@ -51,6 +56,10 @@ public class MouvementPersonnage : MonoBehaviour
       //  MAJDebugConsole();
         MAJPositionPlayer();
         MAJFlipPlayer();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+            GoToMenu();
+
        
         IsGrounded = Physics2D.OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
 
@@ -73,6 +82,14 @@ public class MouvementPersonnage : MonoBehaviour
             moveSpeed = 3;
     }
 
+
+    public void GoToMenu()
+    {
+        this.Menu.gameObject.SetActive(true);
+        this.Chrono.gameObject.SetActive(false);
+        Timer.TimerActive = false;
+        Time.timeScale = 0;
+    }
 
 
     //public GameObject ObjectToDestroy;
