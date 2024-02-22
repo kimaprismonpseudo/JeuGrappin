@@ -8,6 +8,8 @@ public class Timer : MonoBehaviour
     public static Text TempsGraphique;
     public static float TempsCalcul;
 
+    public static bool TimerActive = true;
+
 
     public static float TempsCalculP
     {
@@ -32,8 +34,8 @@ public class Timer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        TempsCalculP = Time.deltaTime;
-    }
+        TempsCalculP = TimerActive ? Time.deltaTime : 0;
+   }
 
     public static void ResetChrono()
     {
