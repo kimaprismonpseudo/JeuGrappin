@@ -291,7 +291,6 @@ public class GrappinSystem : MonoBehaviour
 
     private GrappinSysChild GrappinSys1;
     private GrappinSysChild GrappinSys2;
-    private GrappinSysChild GrappinSysTest;
     public float Ralentissement;
     public static Animator Animator;
     public GameObject MonCurseur;
@@ -341,7 +340,6 @@ public class GrappinSystem : MonoBehaviour
         {
             this.GrappinSys1 = new GrappinSysChild(this.Grappin1, "Grappin1", Clic.MGauche, this.Player.position);
             this.GrappinSys2 = new GrappinSysChild(this.Grappin2, "Grappin2", Clic.MDroit, this.Player.position);
-            this.GrappinSysTest = new GrappinSysChild(this.GrappinTest, "GrappinTest");
 
             this.TabGrappinSys = new List<GrappinSysChild>() { GrappinSys1, GrappinSys2 };
 
