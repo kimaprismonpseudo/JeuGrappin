@@ -168,11 +168,16 @@ public class GrappinSystem : MonoBehaviour
 
         public GrappinSysChild GetPasCeluila()
         {
+            Debug.Log("Youhou");
             foreach (GrappinSysChild g in MesGrappins)
             {
                 if (this != g)
+                {
+                    Debug.Log(g == null);
                     return g;
+                }
             }
+            Debug.Log("Null");
             return null;
         }
 
@@ -320,6 +325,8 @@ public class GrappinSystem : MonoBehaviour
     public GameObject GrappinTest;
     public Rigidbody2D Player;
 
+    public static bool InitLesGrappins = false;
+
     #endregion
 
 
@@ -332,7 +339,11 @@ public class GrappinSystem : MonoBehaviour
             Debug.Log("Grappin OFF");
 
         Animator = this.GetComponent<Animator>();
-    }
+        GrappleMask = this.GetComponent<LayerMask>();
+        Grappin1 = this.GetComponent<GameObject>(); 
+        Grappin2 = this.GetComponent<GameObject>(); 
+        Player = this.GetComponent<Rigidbody2D>(); 
+}                  
 
     private bool InitGrappin()
     {
@@ -349,6 +360,7 @@ public class GrappinSystem : MonoBehaviour
         }
         catch
         {
+            Debug.Log("Marche PAS");
             return false;
         };
         
@@ -358,6 +370,12 @@ public class GrappinSystem : MonoBehaviour
     void Update()
     {
         GrappinSystemUpdate();
+
+        if(InitLesGrappins)
+        {
+            this.InitGrappin();
+            InitLesGrappins = false;
+        }
     }
 
     private void GrappinSystemUpdate()
@@ -367,7 +385,7 @@ public class GrappinSystem : MonoBehaviour
 
         BiblioGenerale.Ralentissement = this.Ralentissement;
 
-        GrappinSystem.Animator.SetBool("IsGrapplingA", GrappinSysChild.GetSomeOneIsGrappling() || !MouvementPersonnage.IsGrounded);
+        Animator.SetBool("IsGrapplingA", GrappinSysChild.GetSomeOneIsGrappling() || !MouvementPersonnage.IsGrounded);
 
         CursorPos();
 
@@ -421,7 +439,9 @@ public class GrappinSystem : MonoBehaviour
 
     private void PositionUpdateAll(ref GrappinSysChild _Grappin)
     {
+        //Debug.Log(_Grappin.GetPasCeluila().Origine.transform.position);
         this.transform.position = _Grappin.Origine.transform.position;
+        //Debug.Log(_Grappin.Origine.transform.position);
         this.Player.velocity = _Grappin.RB.velocity;
 
         _Grappin.GetPasCeluila().Origine.transform.position = _Grappin.Origine.transform.position;

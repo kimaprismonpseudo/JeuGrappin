@@ -6,7 +6,10 @@ using UnityEngine.UI;
 public class Timer : MonoBehaviour
 {
     public static Text TempsGraphique;
-    public static float TempsCalcul;
+    private const float TempsParDefaut = 300;
+    public static float TempsCalcul = TempsParDefaut;
+    public static float TimeScaleTimer = 1;
+
 
     public static bool TimerActive = true;
 
@@ -16,11 +19,15 @@ public class Timer : MonoBehaviour
         get => TempsCalcul; 
         set
         {
-            TempsCalcul += value;
+            TempsCalcul -= value;
             if (value == 0)
-                TempsCalcul = 0;
+                TempsCalcul = TempsParDefaut;
 
             TempsGraphique.text = TimerVersString();
+            if (TempsCalcul <= 0)
+            {
+                FinishControleur.Finish = 2; // Loose temps écoulé 
+            }
         }
     }
     
@@ -35,11 +42,12 @@ public class Timer : MonoBehaviour
     void Update()
     {
         TempsCalculP = TimerActive ? Time.deltaTime : 0;
+
    }
 
     public static void ResetChrono()
     {
-        TempsGraphique.text = "00:00";
+        TempsGraphique.text = TimerVersString();
         TempsCalculP = 0;
     }
 

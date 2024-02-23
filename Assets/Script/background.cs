@@ -21,9 +21,9 @@ public class background : MonoBehaviour
     {
         bgRenderer.material.mainTextureOffset += new Vector2(0, 0.5f);
         hauteurdebase = rb.transform.position.y;
-        Debug.Log(hauteurdebase);
-        Debug.Log(rb.transform.position.y);
-        Debug.Log(rb.transform.position.y - hauteurdebase);
+        //Debug.Log(hauteurdebase);
+        //Debug.Log(rb.transform.position.y);
+        //Debug.Log(rb.transform.position.y - hauteurdebase);
     }
 
     // Update is called once per frame
@@ -33,7 +33,7 @@ public class background : MonoBehaviour
         {
             bgRenderer.material.mainTextureOffset = new Vector2(bgRenderer.material.mainTextureOffset.x + rb.velocity.x * speed * Time.deltaTime, (rb.transform.position.y - hauteurdebase) * speed2);
 
-            Debug.Log($"T : {bgRenderer.material.mainTextureOffset.y}");
+            //Debug.Log($"T : {bgRenderer.material.mainTextureOffset.y}");
         } 
         else
         {

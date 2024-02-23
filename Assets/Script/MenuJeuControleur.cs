@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class MenuJeuControlleur : MonoBehaviour
+public class MenuJeuControleur : MonoBehaviour
 {
     public Button BTNJouer;
     public Button BTNMenu;
@@ -35,16 +35,18 @@ public class MenuJeuControlleur : MonoBehaviour
 
     public void GoToMenu()
     {
+        SceneManager.UnloadScene("LVL1");
         SceneManager.LoadScene("Menu");
-        Time.timeScale = 1;
+        Time.timeScale = Timer.TimeScaleTimer;
         Timer.TimerActive = true;
     }
 
     public void GoToJeu()
     {
         this.Menu.gameObject.SetActive(false);
-        this.Chrono.gameObject.SetActive(true);
+        if (ParametersControleur.ModeJeu == ParametersControleur.Mode.Infraction)
+            this.Chrono.gameObject.SetActive(true);
         Timer.TimerActive = true;
-        Time.timeScale = 1;
+        Time.timeScale = Timer.TimeScaleTimer;
     }
 }

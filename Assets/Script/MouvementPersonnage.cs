@@ -21,6 +21,7 @@ public class MouvementPersonnage : MonoBehaviour
     private Vector3 Velocity = Vector3.zero;
     private bool DebugC = false;
     private bool isFlip;
+    private bool isMenu = false;
 
     public Canvas Menu;
     public Canvas Chrono;
@@ -45,6 +46,10 @@ public class MouvementPersonnage : MonoBehaviour
         //this.isFlip = false;
         Debug.Log("MouvementPersonnage - Debut");
         this.Menu.gameObject.SetActive(false);
+        if (ParametersControleur.ModeJeu == ParametersControleur.Mode.Infraction)
+            this.Chrono.gameObject.SetActive(true);
+        else
+            this.Chrono.gameObject.SetActive(false);
 
         this.rb.freezeRotation = true;
 
@@ -58,7 +63,13 @@ public class MouvementPersonnage : MonoBehaviour
         MAJFlipPlayer();
 
         if (Input.GetKeyDown(KeyCode.Escape))
-            GoToMenu();
+        {
+            if (this.isMenu)
+                GoToJeu();
+            else
+                GoToMenu();
+
+        }
 
        
         IsGrounded = Physics2D.OverlapArea(this.GroundCheckL.position, this.GroundCheckR.position);
@@ -89,6 +100,17 @@ public class MouvementPersonnage : MonoBehaviour
         this.Chrono.gameObject.SetActive(false);
         Timer.TimerActive = false;
         Time.timeScale = 0;
+        this.isMenu = true;
+    }
+
+    public void GoToJeu()
+    {
+        this.Menu.gameObject.SetActive(false);
+        if (ParametersControleur.ModeJeu == ParametersControleur.Mode.Infraction)
+            this.Chrono.gameObject.SetActive(true);
+        Timer.TimerActive = true;
+        Time.timeScale = Timer.TimeScaleTimer;
+        this.isMenu = false;
     }
 
 
@@ -106,6 +128,11 @@ public class MouvementPersonnage : MonoBehaviour
             case "Climbable":
                 isClimb = true;
                 Debug.Log("mouvementClimb");
+                break;
+
+            case "Finish":
+                FinishControleur.Finish = 1; // Win, Fin du lvl
+                Debug.Log("Finish");
                 break;
         }
     }

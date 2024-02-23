@@ -8,7 +8,6 @@ public class MenuControleur : MonoBehaviour
 { 
     [SerializeField] public enum Mode { Infiltration, Infraction };
 
-    [SerializeField] public Mode ModeJeu;
     public Button BTNParameters;
 
     public Canvas Menu;
@@ -16,19 +15,21 @@ public class MenuControleur : MonoBehaviour
 
     public void Start()
     {
+        this.Menu.gameObject.SetActive(true);
+        this.Parameters.gameObject.SetActive(false);
         try
         {
             this.BTNParameters.onClick.AddListener(GoToParameters);
         }
         catch
         { }
-        this.Menu.gameObject.SetActive(true);
-        this.Parameters.gameObject.SetActive(false);
     }
 
     public void ChargeScene(string _NameScene)
     {
         SceneManager.LoadScene(_NameScene);
+        Time.timeScale = Timer.TimeScaleTimer;
+        GrappinSystem.InitLesGrappins = true;
     }
 
     public void QuitMyGame()
@@ -40,6 +41,7 @@ public class MenuControleur : MonoBehaviour
 
     public void GoToParameters()
     {
+        Debug.Log("Test");
         this.Menu.gameObject.SetActive(false);
         this.Parameters.gameObject.SetActive(true);
     }
